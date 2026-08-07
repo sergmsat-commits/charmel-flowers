@@ -1,0 +1,84 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+let pathWithoutLocale = Astro.url.pathname.replace(/^\/(ru|en)(?=\/|$)/, '');
+if (pathWithoutLocale === '') pathWithoutLocale = '/';
+
+const navLabels = {
+  pl: { home: 'Strona główna', catalog: 'Katalog', about: 'O nas', contact: 'Kontakt' },
+  ru: { home: 'Главная', catalog: 'Каталог', about: 'О нас', contact: 'Контакты' },
+  en: { home: 'Home', catalog: 'Catalog', about: 'About', contact: 'Contact' },
+};
+const nav = navLabels[currentLocale] ?? navLabels.pl;
+---
+
+<html lang={currentLocale}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>AURA | Flowers &amp; Decor Warsaw</title>
+  <meta name="description" content="Your aesthetic flowers destination in Warsaw" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/src/styles/global.css" />
+  <script src="/cart.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href={getRelativeLocaleUrl(currentLocale, '/')} class="logo-link">
+        <img src="/images/logo-aura.jpg" alt="AURA Flowers & Decor" class="logo-img" />
+        <span class="logo-text">AURA</span>
+      </a>
+
+      <nav class="main-nav">
+        <a href={getRelativeLocaleUrl(currentLocale, '/')}>{nav.home}</a>
+        <a href={getRelativeLocaleUrl(currentLocale, '/catalog')}>{nav.catalog}</a>
+        <a href={getRelativeLocaleUrl(currentLocale, '/about')}>{nav.about}</a>
+        <a href={getRelativeLocaleUrl(currentLocale, '/contact')}>{nav.contact}</a>
+      </nav>
+
+      <div class="lang-switcher">
+        <a href={getRelativeLocaleUrl('pl', pathWithoutLocale)} class={currentLocale === 'pl' ? 'active' : ''}>PL</a>
+        <a href={getRelativeLocaleUrl('ru', pathWithoutLocale)} class={currentLocale === 'ru' ? 'active' : ''}>RU</a>
+        <a href={getRelativeLocaleUrl('en', pathWithoutLocale)} class={currentLocale === 'en' ? 'active' : ''}>EN</a>
+      </div>
+
+      <a href={getRelativeLocaleUrl(currentLocale, '/cart')} class="cart-link" aria-label="Cart">
+        🛒 <span data-cart-count>0</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>AURA | Flowers &amp; Decor Warsaw</h4>
+        <p class="footer-tagline">Your aesthetic flowers destination in Warsaw</p>
+        <p class="footer-delivery">⚡ Fast delivery: 40-60 min</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>{nav.contact}</h4>
+        <p class="footer-contact">Wilcza 66/68, Warsaw, Poland 00-125</p>
+        <a href="tel:+48000000000" class="footer-phone">+48 000 000 000</a>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/auraflowers_warsaw/" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+          <a href="https://wa.me/48000000000" target="_blank" rel="noopener" aria-label="WhatsApp">WhatsApp</a>
+          <a href="https://t.me/aura_demo_placeholder" target="_blank" rel="noopener" aria-label="Telegram">Telegram</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 AURA Flowers &amp; Decor</p>
+    </div>
+  </footer>
+</body>
+</html>

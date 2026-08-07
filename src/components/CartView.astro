@@ -1,0 +1,195 @@
+---
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'Koszyk', empty: 'Twój koszyk jest pusty.', remove: 'Usuń', total: 'Razem',
+    formTitle: 'Dane do zamówienia',
+    name: 'Imię i nazwisko', phone: 'Telefon', address: 'Adres dostawy',
+    date: 'Data dostawy', time: 'Godzina dostawy', comment: 'Komentarz (opcjonalnie)',
+    submit: 'Złóż zamówienie', sending: 'Wysyłanie...',
+    success: 'Dziękujemy! Twoje zamówienie zostało wysłane.',
+    error: 'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas na Instagramie.',
+  },
+  ru: {
+    title: 'Корзина', empty: 'Ваша корзина пуста.', remove: 'Удалить', total: 'Итого',
+    formTitle: 'Данные для заказа',
+    name: 'Имя и фамилия', phone: 'Телефон', address: 'Адрес доставки',
+    date: 'Дата доставки', time: 'Время доставки', comment: 'Комментарий (необязательно)',
+    submit: 'Оформить заказ', sending: 'Отправка...',
+    success: 'Спасибо! Ваш заказ отправлен.',
+    error: 'Что-то пошло не так. Попробуйте ещё раз или напишите нам в Instagram.',
+  },
+  en: {
+    title: 'Cart', empty: 'Your cart is empty.', remove: 'Remove', total: 'Total',
+    formTitle: 'Order details',
+    name: 'Full name', phone: 'Phone', address: 'Delivery address',
+    date: 'Delivery date', time: 'Delivery time', comment: 'Comment (optional)',
+    submit: 'Place order', sending: 'Sending...',
+    success: 'Thank you! Your order has been sent.',
+    error: 'Something went wrong. Please try again or message us on Instagram.',
+  },
+};
+const t = content[currentLocale] ?? content.pl;
+---
+
+<section class="cart-section">
+  <h1>{t.title}</h1>
+  <div id="cart-items"></div>
+  <p id="cart-empty-msg" class="cart-empty" style="display:none;">{t.empty}</p>
+  <div class="cart-total">
+    <strong>{t.total}: <span id="cart-total-value">0</span> zł</strong>
+  </div>
+
+  <form id="order-form" class="order-form">
+    <h2>{t.formTitle}</h2>
+
+    <label>
+      {t.name}
+      <input type="text" name="name" required />
+    </label>
+
+    <label>
+      {t.phone}
+      <input type="tel" name="phone" required />
+    </label>
+
+    <label>
+      {t.address}
+      <input type="text" name="address" required />
+    </label>
+
+    <div class="order-form-row">
+      <label>
+        {t.date}
+        <input type="date" name="date" id="order-date" required />
+      </label>
+
+      <label>
+        {t.time}
+        <input type="time" name="time" min="09:00" max="21:00" required />
+      </label>
+    </div>
+
+    <label>
+      {t.comment}
+      <textarea name="comment" rows="3"></textarea>
+    </label>
+
+    <button type="submit" id="order-submit-btn">{t.submit}</button>
+    <p id="order-status-msg" class="order-status-msg"></p>
+  </form>
+</section>
+
+<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error }}>
+  const BOT_TOKEN = '8747627753:AAESE4LS6x6uN2ZszncOJ5yDiLcsuLuD3OI';
+  const CHAT_ID = '1875800818';
+
+  function renderCart() {
+    if (!window.AuraCart) return;
+    const cart = window.AuraCart.getCart();
+    const container = document.getElementById('cart-items');
+    const emptyMsg = document.getElementById('cart-empty-msg');
+    const totalEl = document.getElementById('cart-total-value');
+    const form = document.getElementById('order-form');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (cart.length === 0) {
+      emptyMsg.style.display = 'block';
+      form.style.display = 'none';
+    } else {
+      emptyMsg.style.display = 'none';
+      form.style.display = 'block';
+      cart.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'cart-row';
+        row.innerHTML = `
+          <img src="/images/products/${item.cover}" alt="${item.title}" class="cart-row-img" />
+          <div class="cart-row-info">
+            <p class="cart-row-title">${item.title}</p>
+            <p class="cart-row-price">${item.price} zł</p>
+          </div>
+          <div class="cart-row-qty">
+            <button type="button" class="qty-btn" data-action="decrease" data-id="${item.id}">−</button>
+            <span>${item.qty}</span>
+            <button type="button" class="qty-btn" data-action="increase" data-id="${item.id}">+</button>
+          </div>
+          <button type="button" class="cart-remove-btn" data-id="${item.id}">${removeLabel}</button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    totalEl.textContent = window.AuraCart.getTotal();
+
+    container.querySelectorAll('.qty-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        const cart = window.AuraCart.getCart();
+        const item = cart.find((i) => i.id === id);
+        if (!item) return;
+        const delta = btn.getAttribute('data-action') === 'increase' ? 1 : -1;
+        window.AuraCart.updateQty(id, item.qty + delta);
+        renderCart();
+      });
+    });
+
+    container.querySelectorAll('.cart-remove-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        window.AuraCart.removeItem(btn.getAttribute('data-id'));
+        renderCart();
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderCart();
+    const dateInput = document.getElementById('order-date');
+    if (dateInput) {
+      dateInput.min = new Date().toISOString().split('T')[0];
+    }
+  });
+  window.addEventListener('cart:updated', renderCart);
+
+  const orderForm = document.getElementById('order-form');
+  if (orderForm) {
+    orderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('order-submit-btn');
+      const statusMsg = document.getElementById('order-status-msg');
+      const formData = new FormData(orderForm);
+      const cart = window.AuraCart.getCart();
+
+      const itemsText = cart.map((i) => `- ${i.title} x${i.qty} — ${i.price * i.qty} zł`).join('\n');
+      const total = window.AuraCart.getTotal();
+
+      const text = `🌸 Новый заказ (демо AURA)\n\n${itemsText}\n\nИтого: ${total} zł\n\nИмя: ${formData.get('name')}\nТелефон: ${formData.get('phone')}\nАдрес: ${formData.get('address')}\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nКомментарий: ${formData.get('comment') || '—'}`;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = sendingLabel;
+      statusMsg.textContent = '';
+
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: CHAT_ID, text }),
+        });
+        if (!res.ok) throw new Error('Telegram API error');
+
+        statusMsg.textContent = successMsg;
+        statusMsg.className = 'order-status-msg success';
+        window.AuraCart.clearCart();
+        orderForm.reset();
+      } catch (err) {
+        statusMsg.textContent = errorMsg;
+        statusMsg.className = 'order-status-msg error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitLabel;
+      }
+    });
+  }
+</script>

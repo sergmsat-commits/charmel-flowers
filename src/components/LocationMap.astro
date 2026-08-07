@@ -1,0 +1,43 @@
+---
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'Znajdź nas',
+    address: 'Wilcza 66/68, Warszawa, Polska 00-125',
+    phoneLabel: 'Telefon',
+  },
+  ru: {
+    title: 'Как нас найти',
+    address: 'Wilcza 66/68, Варшава, Польша 00-125',
+    phoneLabel: 'Телефон',
+  },
+  en: {
+    title: 'Find Us',
+    address: 'Wilcza 66/68, Warsaw, Poland 00-125',
+    phoneLabel: 'Phone',
+  },
+};
+
+const t = content[currentLocale] ?? content.pl;
+const mapQuery = encodeURIComponent('Wilcza 66/68, Warsaw, Poland 00-125');
+---
+
+<section class="location-section">
+  <h2>{t.title}</h2>
+  <p class="location-address">{t.address}</p>
+  <p class="location-phone">{t.phoneLabel}: <a href="tel:+48000000000">+48 000 000 000</a></p>
+
+  <div class="map-embed">
+    <iframe
+      src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+      width="100%"
+      height="400"
+      style="border:0;"
+      allowfullscreen
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="AURA Flowers & Decor — location map"
+    ></iframe>
+  </div>
+</section>

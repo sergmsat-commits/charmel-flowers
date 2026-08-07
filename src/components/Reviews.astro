@@ -1,0 +1,45 @@
+---
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'Opinie klientów',
+    items: [
+      { name: 'Ania K.', text: 'Piękny bukiet, dostawa dokładnie na czas. Na pewno zamówię jeszcze raz!', rating: 5 },
+      { name: 'Magda W.', text: 'Bardzo estetyczne opakowanie i świeże kwiaty. Polecam.', rating: 5 },
+      { name: 'Ola R.', text: 'Szybka dostawa i miła obsługa w kilku językach — duży plus.', rating: 4 },
+    ],
+  },
+  ru: {
+    title: 'Отзывы клиентов',
+    items: [
+      { name: 'Анна К.', text: 'Красивый букет, доставили точно вовремя. Обязательно закажу ещё раз!', rating: 5 },
+      { name: 'Мария В.', text: 'Очень эстетичная упаковка и свежие цветы. Рекомендую.', rating: 5 },
+      { name: 'Оля Р.', text: 'Быстрая доставка и приятное обслуживание на нескольких языках — большой плюс.', rating: 4 },
+    ],
+  },
+  en: {
+    title: 'Customer Reviews',
+    items: [
+      { name: 'Anna K.', text: 'Beautiful bouquet, delivered right on time. Will definitely order again!', rating: 5 },
+      { name: 'Maggie W.', text: 'Very aesthetic packaging and fresh flowers. Highly recommend.', rating: 5 },
+      { name: 'Olivia R.', text: 'Fast delivery and friendly multilingual service — a big plus.', rating: 4 },
+    ],
+  },
+};
+
+const t = content[currentLocale] ?? content.pl;
+---
+
+<section class="reviews-section">
+  <h2>{t.title}</h2>
+  <div class="reviews-grid">
+    {t.items.map((review) => (
+      <div class="review-card">
+        <p class="review-stars">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
+        <p class="review-text">"{review.text}"</p>
+        <p class="review-name">— {review.name}</p>
+      </div>
+    ))}
+  </div>
+</section>

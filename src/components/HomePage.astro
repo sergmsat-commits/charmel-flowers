@@ -1,0 +1,43 @@
+---
+import AboutUs from './AboutUs.astro';
+import Reviews from './Reviews.astro';
+import LocationMap from './LocationMap.astro';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const hero = {
+  pl: {
+    subtitle: 'Twoje miejsce dla estetycznych kwiatów w Warszawie',
+    delivery: '⚡ Dostawa w 40-60 minut',
+    cta: 'Zobacz katalog',
+  },
+  ru: {
+    subtitle: 'Ваше место для эстетичных цветов в Варшаве',
+    delivery: '⚡ Доставка за 40-60 минут',
+    cta: 'Смотреть каталог',
+  },
+  en: {
+    subtitle: 'Your aesthetic flowers destination in Warsaw',
+    delivery: '⚡ Fast delivery: 40-60 min',
+    cta: 'View Catalog',
+  },
+};
+const t = hero[currentLocale] ?? hero.pl;
+---
+
+<section class="hero-section">
+  <div class="hero-text">
+    <h1>AURA | Flowers &amp; Decor Warsaw</h1>
+    <p class="hero-subtitle">{t.subtitle}</p>
+    <p class="hero-delivery">{t.delivery}</p>
+    <a href={getRelativeLocaleUrl(currentLocale, '/catalog')} class="hero-cta">{t.cta}</a>
+  </div>
+  <div class="hero-image">
+    <img src="/images/hero-photo.jpg" alt="AURA Flowers & Decor" />
+  </div>
+</section>
+
+<AboutUs />
+<Reviews />
+<LocationMap />

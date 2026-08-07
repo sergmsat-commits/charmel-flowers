@@ -1,0 +1,91 @@
+---
+import { getCollection } from 'astro:content';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+const products = await getCollection('products');
+
+const ranges = ['100-200', '200-400', '400-600', '600-800', '1000+', '2000+'];
+
+const labels = {
+  pl: { all: 'Wszystkie', wedding: 'Ślub', currency: 'zł', addToCart: 'Do koszyka' },
+  ru: { all: 'Все', wedding: 'Свадьба', currency: 'zł', addToCart: 'В корзину' },
+  en: { all: 'All', wedding: 'Wedding', currency: 'zł', addToCart: 'Add to cart' },
+};
+const t = labels[currentLocale] ?? labels.pl;
+---
+
+<div class="catalog-wrapper">
+  <div class="price-filter">
+    <button class="filter-btn active" data-type="all">{t.all}</button>
+    {ranges.map((r) => (
+      <button class="filter-btn" data-type="price" data-value={r}>{r}</button>
+    ))}
+    <button class="filter-btn" data-type="category" data-value="wedding">{t.wedding}</button>
+  </div>
+
+  <div class="catalog-grid">
+    {products.map((product) => (
+      <div
+        class="product-card"
+        data-price-range={product.data.priceRange}
+        data-wedding={product.data.wedding ? 'true' : 'false'}
+      >
+        <img src={`/images/products/${product.data.cover}`} alt={product.data.title[currentLocale]} class="product-img" />
+        <h3 class="product-title">{product.data.title[currentLocale]}</h3>
+        <p class="product-description">{product.data.description[currentLocale]}</p>
+        <p class="product-price">{product.data.price} {t.currency}</p>
+        <button
+          class="add-to-cart-btn"
+          data-id={product.id}
+          data-title={product.data.title[currentLocale]}
+          data-price={product.data.price}
+          data-cover={product.data.cover}
+        >
+          {t.addToCart}
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.product-card');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const type = btn.getAttribute('data-type');
+      const value = btn.getAttribute('data-value');
+
+      cards.forEach((card) => {
+        let show = true;
+        if (type === 'price') {
+          show = card.getAttribute('data-price-range') === value;
+        } else if (type === 'category' && value === 'wedding') {
+          show = card.getAttribute('data-wedding') === 'true';
+        }
+        card.style.display = show ? '' : 'none';
+      });
+    });
+  });
+
+  document.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+    const originalText = btn.textContent;
+    btn.addEventListener('click', () => {
+      if (!window.AuraCart) return;
+      window.AuraCart.addItem({
+        id: btn.getAttribute('data-id'),
+        title: btn.getAttribute('data-title'),
+        price: Number(btn.getAttribute('data-price')),
+        cover: btn.getAttribute('data-cover'),
+      });
+      btn.textContent = '✓';
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 1000);
+    });
+  });
+</script>

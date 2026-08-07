@@ -1,0 +1,37 @@
+---
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'O nas',
+    paragraphs: [
+      'AURA | Flowers & Decor to Twoje miejsce dla estetycznych kwiatów w Warszawie.',
+      'Tworzymy bukiety i kompozycje, które łączą elegancję z nowoczesnym stylem — od kameralnych bukietów po efektowne dekoracje na specjalne okazje.',
+      'Dostawa w 40-60 minut oraz obsługa w kilku językach sprawiają, że zamówienie kwiatów jest szybkie i wygodne.',
+    ],
+  },
+  ru: {
+    title: 'О нас',
+    paragraphs: [
+      'AURA | Flowers & Decor — ваше место для эстетичных цветов в Варшаве.',
+      'Мы создаём букеты и композиции, сочетающие элегантность с современным стилем — от камерных букетов до эффектного декора для особых случаев.',
+      'Доставка за 40-60 минут и обслуживание на нескольких языках делают заказ цветов быстрым и удобным.',
+    ],
+  },
+  en: {
+    title: 'About Us',
+    paragraphs: [
+      'AURA | Flowers & Decor is your aesthetic flowers destination in Warsaw.',
+      'We create bouquets and arrangements that blend elegance with a modern style — from intimate bouquets to striking decor for special occasions.',
+      '40-60 minute delivery and multilingual service make ordering flowers fast and convenient.',
+    ],
+  },
+};
+
+const t = content[currentLocale] ?? content.pl;
+---
+
+<section class="about-section">
+  <h2>{t.title}</h2>
+  {t.paragraphs.map((p) => <p>{p}</p>)}
+</section>
