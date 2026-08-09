@@ -47,7 +47,7 @@ const t = labels[currentLocale] ?? labels.pl;
           <img
             src={`/images/products/${product.data.cover}`}
             alt={product.data.title[currentLocale]}
-            class="product-img"
+            class="product-img lightbox-trigger"
             data-images={allImages}
           />
           <h3 class="product-title">{product.data.title[currentLocale]}</h3>
@@ -66,14 +66,6 @@ const t = labels[currentLocale] ?? labels.pl;
       );
     })}
   </div>
-</div>
-
-<div class="lightbox" id="product-lightbox" aria-hidden="true">
-  <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
-  <button class="lightbox-prev" id="lightbox-prev" aria-label="Previous">&#8249;</button>
-  <img src="" alt="" class="lightbox-img" id="lightbox-img" />
-  <button class="lightbox-next" id="lightbox-next" aria-label="Next">&#8250;</button>
-  <p class="lightbox-counter" id="lightbox-counter"></p>
 </div>
 
 <script>
@@ -127,63 +119,5 @@ const t = labels[currentLocale] ?? labels.pl;
         btn.textContent = originalText;
       }, 1000);
     });
-  });
-
-  // Lightbox
-  const lightbox = document.getElementById('product-lightbox');
-  const lightboxImg = document.getElementById('lightbox-img');
-  const lightboxCounter = document.getElementById('lightbox-counter');
-  const lightboxPrev = document.getElementById('lightbox-prev');
-  const lightboxNext = document.getElementById('lightbox-next');
-  const lightboxClose = document.getElementById('lightbox-close');
-
-  let currentImages = [];
-  let currentIndex = 0;
-
-  function updateLightboxImage() {
-    lightboxImg.src = currentImages[currentIndex];
-    const multi = currentImages.length > 1;
-    lightboxCounter.textContent = multi ? `${currentIndex + 1} / ${currentImages.length}` : '';
-    lightboxPrev.style.display = multi ? '' : 'none';
-    lightboxNext.style.display = multi ? '' : 'none';
-  }
-
-  function openLightbox(images, startIndex) {
-    currentImages = images;
-    currentIndex = startIndex;
-    updateLightboxImage();
-    lightbox.classList.add('is-open');
-    lightbox.setAttribute('aria-hidden', 'false');
-  }
-
-  function closeLightbox() {
-    lightbox.classList.remove('is-open');
-    lightbox.setAttribute('aria-hidden', 'true');
-  }
-
-  document.querySelectorAll('.product-img').forEach((img) => {
-    img.addEventListener('click', () => {
-      const images = img.getAttribute('data-images').split(',');
-      openLightbox(images, 0);
-    });
-  });
-
-  lightboxClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
-  lightboxPrev.addEventListener('click', () => {
-    currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
-    updateLightboxImage();
-  });
-  lightboxNext.addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % currentImages.length;
-    updateLightboxImage();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('is-open')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') lightboxPrev.click();
-    if (e.key === 'ArrowRight') lightboxNext.click();
   });
 </script>

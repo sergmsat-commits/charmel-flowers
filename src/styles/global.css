@@ -295,7 +295,7 @@ h1, h2, h3, h4 {
   letter-spacing: 0.5px;
 }
 
-.product-img {
+.lightbox-trigger {
   cursor: zoom-in;
 }
 
@@ -661,7 +661,6 @@ h1, h2, h3, h4 {
 
 .cart-link {
   font-size: 1.1rem;
-  margin-left: 12px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -903,16 +902,21 @@ h1, h2, h3, h4 {
   }
 
   .logo-link {
-    max-width: calc(100% - 110px);
+    max-width: calc(100% - 195px);
+  }
+
+  .logo-img {
+    width: 36px;
+    height: 36px;
   }
 
   .logo-text {
-    font-size: 1.05rem;
-    letter-spacing: 1px;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
   }
 
   .header-right {
-    gap: 14px;
+    gap: 8px;
   }
 
   .mobile-menu-toggle {
@@ -946,7 +950,12 @@ h1, h2, h3, h4 {
   }
 
   .lang-switcher {
-    gap: 10px;
+    gap: 4px;
+  }
+
+  .lang-switcher a {
+    padding: 3px 6px;
+    font-size: 0.75rem;
   }
 
   .footer-inner {

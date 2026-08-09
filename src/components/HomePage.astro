@@ -34,7 +34,12 @@ const t = hero[currentLocale] ?? hero.pl;
     <a href={getRelativeLocaleUrl(currentLocale, '/catalog')} class="hero-cta">{t.cta}</a>
   </div>
   <div class="hero-image">
-    <img src="/images/products/bouquet-05.jpg" alt="Charmel Flowers" />
+    <img
+      src="/images/products/bouquet-05.jpg"
+      alt="Charmel Flowers"
+      class="lightbox-trigger"
+      data-images="/images/products/bouquet-05.jpg"
+    />
   </div>
 </section>
 

@@ -86,18 +86,18 @@ const f = footer[currentLocale] ?? footer.pl;
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const revealEls = document.querySelectorAll('.reveal');
-      if (!revealEls.length) return;
+      if (revealEls.length) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.1 });
-
-      revealEls.forEach((el) => observer.observe(el));
+        revealEls.forEach((el) => observer.observe(el));
+      }
 
       const menuToggle = document.getElementById('mobile-menu-toggle');
       const navDropdown = document.getElementById('nav-dropdown');
@@ -108,6 +108,64 @@ const f = footer[currentLocale] ?? footer.pl;
           menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         });
       }
+
+      // Lightbox — общий для всего сайта, включается классом .lightbox-trigger + data-images
+      const lightbox = document.getElementById('site-lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const lightboxCounter = document.getElementById('lightbox-counter');
+      const lightboxPrev = document.getElementById('lightbox-prev');
+      const lightboxNext = document.getElementById('lightbox-next');
+      const lightboxClose = document.getElementById('lightbox-close');
+
+      let currentImages = [];
+      let currentIndex = 0;
+
+      function updateLightboxImage() {
+        lightboxImg.src = currentImages[currentIndex];
+        const multi = currentImages.length > 1;
+        lightboxCounter.textContent = multi ? `${currentIndex + 1} / ${currentImages.length}` : '';
+        lightboxPrev.style.display = multi ? '' : 'none';
+        lightboxNext.style.display = multi ? '' : 'none';
+      }
+
+      function openLightbox(images, startIndex) {
+        currentImages = images;
+        currentIndex = startIndex;
+        updateLightboxImage();
+        lightbox.classList.add('is-open');
+        lightbox.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove('is-open');
+        lightbox.setAttribute('aria-hidden', 'true');
+      }
+
+      document.querySelectorAll('.lightbox-trigger').forEach((img) => {
+        img.addEventListener('click', () => {
+          const images = img.getAttribute('data-images').split(',');
+          openLightbox(images, 0);
+        });
+      });
+
+      lightboxClose.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      lightboxPrev.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        updateLightboxImage();
+      });
+      lightboxNext.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        updateLightboxImage();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') lightboxPrev.click();
+        if (e.key === 'ArrowRight') lightboxNext.click();
+      });
     });
   </script>
 </head>
@@ -126,15 +184,15 @@ const f = footer[currentLocale] ?? footer.pl;
           <a href={getRelativeLocaleUrl(currentLocale, '/about')}>{nav.about}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/contact')}>{nav.contact}</a>
         </nav>
+      </div>
 
+      <div class="header-right">
         <div class="lang-switcher">
           <a href={getRelativeLocaleUrl('pl', pathWithoutLocale)} class={currentLocale === 'pl' ? 'active' : ''}>PL</a>
           <a href={getRelativeLocaleUrl('ru', pathWithoutLocale)} class={currentLocale === 'ru' ? 'active' : ''}>RU</a>
           <a href={getRelativeLocaleUrl('en', pathWithoutLocale)} class={currentLocale === 'en' ? 'active' : ''}>EN</a>
         </div>
-      </div>
 
-      <div class="header-right">
         <a href={getRelativeLocaleUrl(currentLocale, '/cart')} class="cart-link" aria-label="Cart">
           🛒 <span data-cart-count>0</span>
         </a>
@@ -182,5 +240,13 @@ const f = footer[currentLocale] ?? footer.pl;
       <p class="footer-rights">{f.rights}</p>
     </div>
   </footer>
+
+  <div class="lightbox" id="site-lightbox" aria-hidden="true">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox-prev" id="lightbox-prev" aria-label="Previous">&#8249;</button>
+    <img src="" alt="" class="lightbox-img" id="lightbox-img" />
+    <button class="lightbox-next" id="lightbox-next" aria-label="Next">&#8250;</button>
+    <p class="lightbox-counter" id="lightbox-counter"></p>
+  </div>
 </body>
 </html>
