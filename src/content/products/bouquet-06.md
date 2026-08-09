@@ -1,13 +1,15 @@
 ---
 title:
-  pl: "Gigant Mix Box — kwiatowy gigant"
-  ru: "Gigant Mix Box — цветочный гигант"
-  en: "Gigant Mix Box — Giant Flower Arrangement"
+  pl: "Biały bukiet — akcja"
+  ru: "Белый букет — акция"
+  en: "White Bouquet — Special Offer"
 description:
-  pl: "Największa kompozycja kwiatowa w ofercie — efekt WOW gwarantowany."
-  ru: "Самая крупная цветочная композиция в ассортименте — эффект WOW гарантирован."
-  en: "Our largest flower arrangement — guaranteed WOW effect."
-price: 3750
-priceRange: "2000+"
+  pl: "Białe róże, hortensja, chryzantemy i rumianek — elegancka biel w promocyjnej cenie."
+  ru: "Белые розы, гортензия, хризантемы и ромашка — элегантная белизна по акционной цене."
+  en: "White roses, hydrangea, chrysanthemums and daisies — elegant white blooms at a special price."
+price: 180
+priceRange: "100-200"
 cover: "bouquet-06.jpg"
+promo: true
+featured: true
 ---

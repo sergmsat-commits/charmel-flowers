@@ -4,40 +4,89 @@ const currentLocale = Astro.currentLocale ?? 'pl';
 const content = {
   pl: {
     title: 'Znajdź nas',
-    address: 'Wilcza 66/68, Warszawa, Polska 00-125',
+    address: 'Stryjeńskich 6/lok.UH1B, 02-791 Warszawa',
     phoneLabel: 'Telefon',
+    hoursTitle: 'Godziny otwarcia',
+    hours: [
+      { days: 'Pon\u2013Pt', time: '10:00\u201320:00' },
+      { days: 'Sob', time: '10:00\u201318:00' },
+      { days: 'Nie', time: '10:00\u201317:00' },
+    ],
+    ratingText: '4.9 ★ · 78 opinii na Google',
+    reviewPrimary: 'Zostaw opinię na Google',
+    reviewSecondary: 'Masz uwagę lub pytanie? Napisz do nas na WhatsApp',
+    whatsappText: 'Cześć! Chciałbym/chciałabym zostawić opinię o moim zamówieniu: ',
   },
   ru: {
     title: 'Как нас найти',
-    address: 'Wilcza 66/68, Варшава, Польша 00-125',
+    address: 'Stryjeńskich 6/lok.UH1B, 02-791 Варшава, Польша',
     phoneLabel: 'Телефон',
+    hoursTitle: 'Часы работы',
+    hours: [
+      { days: 'Пн\u2013Пт', time: '10:00\u201320:00' },
+      { days: 'Сб', time: '10:00\u201318:00' },
+      { days: 'Вс', time: '10:00\u201317:00' },
+    ],
+    ratingText: '4.9 ★ · 78 отзывов на Google',
+    reviewPrimary: 'Оставить отзыв на Google',
+    reviewSecondary: 'Есть замечание или вопрос? Напишите нам в WhatsApp',
+    whatsappText: 'Здравствуйте! Хочу оставить отзыв о моём заказе: ',
   },
   en: {
     title: 'Find Us',
-    address: 'Wilcza 66/68, Warsaw, Poland 00-125',
+    address: 'Stryjeńskich 6/lok.UH1B, 02-791 Warsaw, Poland',
     phoneLabel: 'Phone',
+    hoursTitle: 'Opening Hours',
+    hours: [
+      { days: 'Mon\u2013Fri', time: '10:00\u201320:00' },
+      { days: 'Sat', time: '10:00\u201318:00' },
+      { days: 'Sun', time: '10:00\u201317:00' },
+    ],
+    ratingText: '4.9 ★ · 78 Google reviews',
+    reviewPrimary: 'Leave a Google Review',
+    reviewSecondary: 'Have a question or concern? Message us on WhatsApp',
+    whatsappText: "Hi! I'd like to leave a review about my order: ",
   },
 };
 
 const t = content[currentLocale] ?? content.pl;
-const mapQuery = encodeURIComponent('Wilcza 66/68, Warsaw, Poland 00-125');
+const mapLat = 52.1329367;
+const mapLng = 21.0575091;
+const googleReviewUrl = 'https://search.google.com/local/writereview?placeid=ChIJpZguVQktGUcRgcZuk78afvE';
+const whatsappReviewUrl = `https://wa.me/48514011410?text=${encodeURIComponent(t.whatsappText)}`;
 ---
 
-<section class="location-section">
+<section class="location-section reveal">
   <h2>{t.title}</h2>
   <p class="location-address">{t.address}</p>
-  <p class="location-phone">{t.phoneLabel}: <a href="tel:+48000000000">+48 000 000 000</a></p>
+  <p class="location-phone">{t.phoneLabel}: <a href="tel:+48514011410">+48 514 011 410</a></p>
+
+  <div class="location-hours">
+    <h3>{t.hoursTitle}</h3>
+    {t.hours.map((row) => (
+      <p class="location-hours-row">
+        <span>{row.days}</span>
+        <span>{row.time}</span>
+      </p>
+    ))}
+  </div>
 
   <div class="map-embed">
     <iframe
-      src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+      src={`https://www.google.com/maps?q=${mapLat},${mapLng}&output=embed`}
       width="100%"
       height="400"
       style="border:0;"
       allowfullscreen
       loading="lazy"
       referrerpolicy="no-referrer-when-downgrade"
-      title="AURA Flowers & Decor — location map"
+      title="Charmel Flowers — location map"
     ></iframe>
+  </div>
+
+  <div class="review-cta">
+    <p class="review-cta-rating">{t.ratingText}</p>
+    <a href={googleReviewUrl} target="_blank" rel="noopener" class="review-cta-primary">{t.reviewPrimary}</a>
+    <a href={whatsappReviewUrl} target="_blank" rel="noopener" class="review-cta-secondary">{t.reviewSecondary}</a>
   </div>
 </section>

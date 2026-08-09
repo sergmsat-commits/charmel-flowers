@@ -1,13 +1,13 @@
 ---
 title:
-  pl: "Kompozycja ze 101 gałązek w koszyku"
-  ru: "Композиция из 101 ветки в корзине"
-  en: "101-Stem Basket Arrangement"
+  pl: "Bukiet z pudrowych róż XXL"
+  ru: "Букет из пудровых роз XXL"
+  en: "XXL Powder Pink Rose Bouquet"
 description:
-  pl: "Efektowna kompozycja ze 101 białych gałązek kwiatowych w wiklinowym koszyku."
-  ru: "Эффектная композиция из 101 белой веточки в плетёной корзине."
-  en: "A striking arrangement of 101 white floral stems in a wicker basket."
-price: 1360
+  pl: "Obszerny, reprezentacyjny bukiet z róż w odcieniach pudrowego różu i kremu."
+  ru: "Объёмный, эффектный букет из роз в пудрово-розовых и кремовых оттенках."
+  en: "A generous, statement bouquet of roses in powder pink and cream tones."
+price: 1350
 priceRange: "1000+"
 cover: "bouquet-05.jpg"
 ---

@@ -1,13 +1,13 @@
 ---
 title:
-  pl: "Piwoniowa róża White O'Hara"
-  ru: "Пионовидная роза White O'Hara"
-  en: "White O'Hara Peony Rose Bouquet"
+  pl: "Czerwone róże z goździkami"
+  ru: "Красные розы с гвоздиками"
+  en: "Red Roses with Carnations"
 description:
-  pl: "Pachnący bukiet z piwoniowych róż White O'Hara i eukaliptusem."
-  ru: "Ароматный букет из пионовидных роз White O'Hara с эвкалиптом."
-  en: "Fragrant bouquet of White O'Hara peony roses with eucalyptus."
-price: 440
+  pl: "Intensywnie czerwone róże w towarzystwie pudrowych goździków i eukaliptusa."
+  ru: "Насыщенно-красные розы в сочетании с пудровыми гвоздиками и эвкалиптом."
+  en: "Deep red roses paired with dusty pink carnations and eucalyptus."
+price: 480
 priceRange: "400-600"
 cover: "bouquet-03.jpg"
 ---

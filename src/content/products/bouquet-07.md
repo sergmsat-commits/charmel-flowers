@@ -1,14 +1,14 @@
 ---
 title:
-  pl: "Bukiet ślubny z kalii"
-  ru: "Свадебный букет из калл"
-  en: "Wedding Calla Lily Bouquet"
+  pl: "Bukiet ślubny z perełkami"
+  ru: "Свадебный букет с жемчугом"
+  en: "Wedding Bouquet with Pearls"
 description:
-  pl: "Elegancki bukiet ślubny z białych kalii."
-  ru: "Элегантный свадебный букет из белых калл."
-  en: "An elegant wedding bouquet of white calla lilies."
-price: 350
-priceRange: "200-400"
-wedding: true
+  pl: "Białe róże ozdobione perełkami, w komplecie z butonierką dla pana młodego."
+  ru: "Белые розы, украшенные жемчужными нитями, в комплекте с бутоньеркой для жениха."
+  en: "White roses adorned with pearl strands, paired with a matching boutonniere for the groom."
+price: 650
+priceRange: "600-800"
 cover: "bouquet-07.jpg"
+wedding: true
 ---

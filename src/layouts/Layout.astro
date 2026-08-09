@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import '../styles/global.css';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 
@@ -12,6 +13,62 @@ const navLabels = {
   en: { home: 'Home', catalog: 'Catalog', about: 'About', contact: 'Contact' },
 };
 const nav = navLabels[currentLocale] ?? navLabels.pl;
+
+const meta = {
+  pl: {
+    title: 'Charmel Flowers | Kwiaciarnia Warszawa',
+    description: 'Bukiety, które robią wrażenie. Kwiaciarnia w Warszawie z realizacją w 15 minut.',
+  },
+  ru: {
+    title: 'Charmel Flowers | Цветочный магазин в Варшаве',
+    description: 'Цветочный магазин в Варшаве, где букет готов за 15 минут.',
+  },
+  en: {
+    title: 'Charmel Flowers | Warsaw Flower Shop',
+    description: 'A Warsaw flower shop with 15-minute bouquet preparation.',
+  },
+};
+const m = meta[currentLocale] ?? meta.pl;
+
+const footer = {
+  pl: {
+    heading: 'Charmel Flowers | Kwiaciarnia Warszawa',
+    tagline: 'Bukiety, które robią wrażenie 🌺',
+    delivery: '⚡ Bukiet gotowy w 15 minut • 🚗 Dostawa: Uber / Wolt',
+    hoursTitle: 'Godziny otwarcia',
+    hours: [
+      { days: 'Pon\u2013Pt', time: '10:00\u201320:00' },
+      { days: 'Sob', time: '10:00\u201318:00' },
+      { days: 'Nie', time: '10:00\u201317:00' },
+    ],
+    rights: 'Wszelkie prawa zastrzeżone',
+  },
+  ru: {
+    heading: 'Charmel Flowers | Цветочный магазин Варшава',
+    tagline: 'Букеты, которые производят впечатление 🌺',
+    delivery: '⚡ Букет готов за 15 минут • 🚗 Доставка: Uber / Wolt',
+    hoursTitle: 'Часы работы',
+    hours: [
+      { days: 'Пн\u2013Пт', time: '10:00\u201320:00' },
+      { days: 'Сб', time: '10:00\u201318:00' },
+      { days: 'Вс', time: '10:00\u201317:00' },
+    ],
+    rights: 'Все права защищены',
+  },
+  en: {
+    heading: 'Charmel Flowers | Warsaw Flower Shop',
+    tagline: 'Bouquets that make an impression 🌺',
+    delivery: '⚡ Bouquet ready in 15 minutes • 🚗 Delivery: Uber / Wolt',
+    hoursTitle: 'Opening Hours',
+    hours: [
+      { days: 'Mon\u2013Fri', time: '10:00\u201320:00' },
+      { days: 'Sat', time: '10:00\u201318:00' },
+      { days: 'Sun', time: '10:00\u201317:00' },
+    ],
+    rights: 'All rights reserved',
+  },
+};
+const f = footer[currentLocale] ?? footer.pl;
 ---
 
 <html lang={currentLocale}>
@@ -19,18 +76,37 @@ const nav = navLabels[currentLocale] ?? navLabels.pl;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>AURA | Flowers &amp; Decor Warsaw</title>
-  <meta name="description" content="Your aesthetic flowers destination in Warsaw" />
+  <title>{m.title}</title>
+  <meta name="description" content={m.description} />
   <link rel="icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="/src/styles/global.css" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <script is:inline>document.documentElement.classList.add('js-ready');</script>
   <script src="/cart.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const revealEls = document.querySelectorAll('.reveal');
+      if (!revealEls.length) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      revealEls.forEach((el) => observer.observe(el));
+    });
+  </script>
 </head>
 <body>
   <header class="site-header">
     <div class="header-inner">
       <a href={getRelativeLocaleUrl(currentLocale, '/')} class="logo-link">
-        <img src="/images/logo-aura.jpg" alt="AURA Flowers & Decor" class="logo-img" />
-        <span class="logo-text">AURA</span>
+        <img src="/images/logo-charmel.jpg" alt="Charmel Flowers" class="logo-img" />
+        <span class="logo-text">Charmel Flowers</span>
       </a>
 
       <nav class="main-nav">
@@ -59,25 +135,34 @@ const nav = navLabels[currentLocale] ?? navLabels.pl;
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-col">
-        <h4>AURA | Flowers &amp; Decor Warsaw</h4>
-        <p class="footer-tagline">Your aesthetic flowers destination in Warsaw</p>
-        <p class="footer-delivery">⚡ Fast delivery: 40-60 min</p>
+        <h4>{f.heading}</h4>
+        <p class="footer-tagline">{f.tagline}</p>
+        <p class="footer-delivery">{f.delivery}</p>
       </div>
 
       <div class="footer-col">
         <h4>{nav.contact}</h4>
-        <p class="footer-contact">Wilcza 66/68, Warsaw, Poland 00-125</p>
-        <a href="tel:+48000000000" class="footer-phone">+48 000 000 000</a>
+        <p class="footer-contact">Stryjeńskich 6/lok.UH1B, 02-791 Warszawa</p>
+        <a href="tel:+48514011410" class="footer-phone">+48 514 011 410</a>
         <div class="footer-social">
-          <a href="https://www.instagram.com/auraflowers_warsaw/" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
-          <a href="https://wa.me/48000000000" target="_blank" rel="noopener" aria-label="WhatsApp">WhatsApp</a>
-          <a href="https://t.me/aura_demo_placeholder" target="_blank" rel="noopener" aria-label="Telegram">Telegram</a>
+          <a href="https://www.instagram.com/charmelflowers/" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+          <a href="https://wa.me/48514011410" target="_blank" rel="noopener" aria-label="WhatsApp">WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>{f.hoursTitle}</h4>
+        <div class="footer-hours">
+          {f.hours.map((row) => (
+            <p>{row.days}: {row.time}</p>
+          ))}
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 2026 AURA Flowers &amp; Decor</p>
+      <p>&copy; 2026 Charmel Flowers</p>
+      <p class="footer-rights">{f.rights}</p>
     </div>
   </footer>
 </body>

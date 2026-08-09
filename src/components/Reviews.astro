@@ -5,25 +5,31 @@ const content = {
   pl: {
     title: 'Opinie klientów',
     items: [
-      { name: 'Ania K.', text: 'Piękny bukiet, dostawa dokładnie na czas. Na pewno zamówię jeszcze raz!', rating: 5 },
-      { name: 'Magda W.', text: 'Bardzo estetyczne opakowanie i świeże kwiaty. Polecam.', rating: 5 },
-      { name: 'Ola R.', text: 'Szybka dostawa i miła obsługa w kilku językach — duży plus.', rating: 4 },
+      { name: 'Kasia M.', text: 'Bukiet gotowy w 15 minut — nie wierzyłam, że to możliwe! Świeże kwiaty i piękne opakowanie.', rating: 5 },
+      { name: 'Ola T.', text: 'Zamówiłam świecę zapachową na prezent — pięknie zapakowana, idealna jako upominek.', rating: 5 },
+      { name: 'Marta W.', text: 'Bukiet ślubny przerósł moje oczekiwania. Dostawa przez Wolt zajęła nieco dłużej niż zwykle, ale efekt wart był czekania.', rating: 4 },
+      { name: 'Zofia P.', text: 'Zamówiłam hiacynt w eleganckim pudełku na urodziny mamy — wyglądał przepięknie, super pomysł na prezent.', rating: 5 },
+      { name: 'Nina K.', text: 'Biały bukiet z akcji wyglądał równie pięknie jak te w standardowej cenie — naprawdę polecam.', rating: 5 },
     ],
   },
   ru: {
     title: 'Отзывы клиентов',
     items: [
-      { name: 'Анна К.', text: 'Красивый букет, доставили точно вовремя. Обязательно закажу ещё раз!', rating: 5 },
-      { name: 'Мария В.', text: 'Очень эстетичная упаковка и свежие цветы. Рекомендую.', rating: 5 },
-      { name: 'Оля Р.', text: 'Быстрая доставка и приятное обслуживание на нескольких языках — большой плюс.', rating: 4 },
+      { name: 'Кася М.', text: 'Букет был готов за 15 минут — не верилось, что это возможно! Свежие цветы и красивая упаковка.', rating: 5 },
+      { name: 'Оля Т.', text: 'Заказала ароматическую свечу в подарок — красиво упакована, отличный подарок.', rating: 5 },
+      { name: 'Марта В.', text: 'Свадебный букет превзошёл ожидания. Доставка через Wolt заняла чуть дольше обычного, но результат того стоил.', rating: 4 },
+      { name: 'Зофия П.', text: 'Заказала гиацинт в элегантной коробке на день рождения мамы — выглядел великолепно, отличная идея для подарка.', rating: 5 },
+      { name: 'Нина К.', text: 'Белый букет по акции выглядел так же красиво, как и букеты по обычной цене — действительно рекомендую.', rating: 5 },
     ],
   },
   en: {
     title: 'Customer Reviews',
     items: [
-      { name: 'Anna K.', text: 'Beautiful bouquet, delivered right on time. Will definitely order again!', rating: 5 },
-      { name: 'Maggie W.', text: 'Very aesthetic packaging and fresh flowers. Highly recommend.', rating: 5 },
-      { name: 'Olivia R.', text: 'Fast delivery and friendly multilingual service — a big plus.', rating: 4 },
+      { name: 'Kate M.', text: "The bouquet was ready in 15 minutes — I didn't believe it was possible! Fresh flowers and beautiful packaging.", rating: 5 },
+      { name: 'Olivia T.', text: 'Ordered a scented candle as a gift — beautifully packaged, a perfect present.', rating: 5 },
+      { name: 'Martha W.', text: 'The wedding bouquet exceeded my expectations. Wolt delivery took a bit longer than usual, but it was worth the wait.', rating: 4 },
+      { name: 'Sophie P.', text: "Ordered the hyacinth in a branded box for my mom's birthday — it looked stunning, a great gift idea.", rating: 5 },
+      { name: 'Nina K.', text: 'The white bouquet from the promo looked just as beautiful as the regular-priced ones — I really recommend it.', rating: 5 },
     ],
   },
 };
@@ -31,15 +37,24 @@ const content = {
 const t = content[currentLocale] ?? content.pl;
 ---
 
-<section class="reviews-section">
+<section class="reviews-section reveal">
   <h2>{t.title}</h2>
-  <div class="reviews-grid">
-    {t.items.map((review) => (
-      <div class="review-card">
-        <p class="review-stars">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
-        <p class="review-text">"{review.text}"</p>
-        <p class="review-name">— {review.name}</p>
-      </div>
-    ))}
+  <div class="reviews-track-wrapper">
+    <div class="reviews-track">
+      {t.items.map((review) => (
+        <div class="review-card">
+          <p class="review-stars">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
+          <p class="review-text">"{review.text}"</p>
+          <p class="review-name">— {review.name}</p>
+        </div>
+      ))}
+      {t.items.map((review) => (
+        <div class="review-card" aria-hidden="true">
+          <p class="review-stars">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</p>
+          <p class="review-text">"{review.text}"</p>
+          <p class="review-name">— {review.name}</p>
+        </div>
+      ))}
+    </div>
   </div>
 </section>

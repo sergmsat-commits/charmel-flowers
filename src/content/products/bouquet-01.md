@@ -1,13 +1,13 @@
 ---
 title:
-  pl: "Bukiet z 51 róż"
-  ru: "Букет из 51 розы"
-  en: "51 Roses Bouquet"
+  pl: "Bukiet słonecznikowy z eukaliptusem"
+  ru: "Букет с подсолнухами и эвкалиптом"
+  en: "Sunflower Bouquet with Eucalyptus"
 description:
-  pl: "Bukiet z 51 czerwonych i białych róż w eleganckim opakowaniu."
-  ru: "Букет из 51 красной и белой розы в элегантной упаковке."
-  en: "A bouquet of 51 red and white roses in elegant wrapping."
-price: 370
-priceRange: "200-400"
+  pl: "Słoneczniki, białe kwiaty i gałązki eukaliptusa w naturalnym, letnim stylu."
+  ru: "Подсолнухи, белые цветы и веточки эвкалипта в естественном летнем стиле."
+  en: "Sunflowers, white blooms and eucalyptus sprigs in a natural, summery style."
+price: 160
+priceRange: "100-200"
 cover: "bouquet-01.jpg"
 ---

@@ -1,13 +1,14 @@
 ---
 title:
-  pl: "Bukiet w odcieniach różu i brzoskwini"
-  ru: "Букет в розово-персиковых тонах"
-  en: "Pink & Peach Bouquet"
+  pl: "Malinowe róże — bukiet objętościowy"
+  ru: "Малиновые розы — объёмный букет"
+  en: "Raspberry Pink Roses — Statement Bouquet"
 description:
-  pl: "Bujny bukiet z róż i piwonii w odcieniach różu i brzoskwini."
-  ru: "Пышный букет из роз и пионов в розово-персиковых тонах."
-  en: "A lush bouquet of roses and peonies in pink and peach tones."
-price: 785
+  pl: "Intensywnie różowe róże z delikatnymi dodatkami — bukiet, który robi wrażenie."
+  ru: "Насыщенно-розовые розы с нежными акцентами — букет, который производит впечатление."
+  en: "Vivid pink roses with delicate accents — a bouquet that makes an impression."
+price: 720
 priceRange: "600-800"
 cover: "bouquet-04.jpg"
+featured: true
 ---

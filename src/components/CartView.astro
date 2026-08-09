@@ -7,6 +7,7 @@ const content = {
     formTitle: 'Dane do zamówienia',
     name: 'Imię i nazwisko', phone: 'Telefon', address: 'Adres dostawy',
     date: 'Data dostawy', time: 'Godzina dostawy', comment: 'Komentarz (opcjonalnie)',
+    consent: 'Wyrażam zgodę na przetwarzanie moich danych osobowych w celu realizacji zamówienia (zgodnie z RODO).',
     submit: 'Złóż zamówienie', sending: 'Wysyłanie...',
     success: 'Dziękujemy! Twoje zamówienie zostało wysłane.',
     error: 'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas na Instagramie.',
@@ -16,6 +17,7 @@ const content = {
     formTitle: 'Данные для заказа',
     name: 'Имя и фамилия', phone: 'Телефон', address: 'Адрес доставки',
     date: 'Дата доставки', time: 'Время доставки', comment: 'Комментарий (необязательно)',
+    consent: 'Я даю согласие на обработку моих персональных данных для оформления заказа (в соответствии с RODO/GDPR).',
     submit: 'Оформить заказ', sending: 'Отправка...',
     success: 'Спасибо! Ваш заказ отправлен.',
     error: 'Что-то пошло не так. Попробуйте ещё раз или напишите нам в Instagram.',
@@ -25,6 +27,7 @@ const content = {
     formTitle: 'Order details',
     name: 'Full name', phone: 'Phone', address: 'Delivery address',
     date: 'Delivery date', time: 'Delivery time', comment: 'Comment (optional)',
+    consent: 'I agree to the processing of my personal data for the purpose of order fulfillment (in accordance with GDPR).',
     submit: 'Place order', sending: 'Sending...',
     success: 'Thank you! Your order has been sent.',
     error: 'Something went wrong. Please try again or message us on Instagram.',
@@ -76,13 +79,19 @@ const t = content[currentLocale] ?? content.pl;
       <textarea name="comment" rows="3"></textarea>
     </label>
 
+    <label class="order-form-checkbox">
+      <input type="checkbox" name="consent" required />
+      <span>{t.consent}</span>
+    </label>
+
     <button type="submit" id="order-submit-btn">{t.submit}</button>
     <p id="order-status-msg" class="order-status-msg"></p>
   </form>
 </section>
 
 <script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error }}>
-  const BOT_TOKEN = '8747627753:AAESE4LS6x6uN2ZszncOJ5yDiLcsuLuD3OI';
+  // TODO: перед деплоем заменить на токен и chat_id НОВОГО бота Charmel Flowers
+  const BOT_TOKEN = '8830224963:AAH6Ys9RiSz6ngBd6s7Q_4LjSDlJP7l1OZI';
   const CHAT_ID = '1875800818';
 
   function renderCart() {
@@ -165,7 +174,7 @@ const t = content[currentLocale] ?? content.pl;
       const itemsText = cart.map((i) => `- ${i.title} x${i.qty} — ${i.price * i.qty} zł`).join('\n');
       const total = window.AuraCart.getTotal();
 
-      const text = `🌸 Новый заказ (демо AURA)\n\n${itemsText}\n\nИтого: ${total} zł\n\nИмя: ${formData.get('name')}\nТелефон: ${formData.get('phone')}\nАдрес: ${formData.get('address')}\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nКомментарий: ${formData.get('comment') || '—'}`;
+      const text = `🌸 Новый заказ (Charmel Flowers)\n\n${itemsText}\n\nИтого: ${total} zł\n\nИмя: ${formData.get('name')}\nТелефон: ${formData.get('phone')}\nАдрес: ${formData.get('address')}\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nКомментарий: ${formData.get('comment') || '—'}\nСогласие на обработку данных: получено`;
 
       submitBtn.disabled = true;
       submitBtn.textContent = sendingLabel;

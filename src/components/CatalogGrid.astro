@@ -4,32 +4,42 @@ import { getCollection } from 'astro:content';
 const currentLocale = Astro.currentLocale ?? 'pl';
 const products = await getCollection('products');
 
-const ranges = ['100-200', '200-400', '400-600', '600-800', '1000+', '2000+'];
+const ranges = ['100-200', '200-400', '400-600', '600-800', '1000+'];
 
 const labels = {
-  pl: { all: 'Wszystkie', wedding: 'Ślub', currency: 'zł', addToCart: 'Do koszyka' },
-  ru: { all: 'Все', wedding: 'Свадьба', currency: 'zł', addToCart: 'В корзину' },
-  en: { all: 'All', wedding: 'Wedding', currency: 'zł', addToCart: 'Add to cart' },
+  pl: { all: 'Wszystkie', wedding: 'Ślub', promo: 'Akcja', handmade: 'Rękodzieło', featured: 'Polecane', currency: 'zł', addToCart: 'Do koszyka' },
+  ru: { all: 'Все', wedding: 'Свадьба', promo: 'Акция', handmade: 'Ручная работа', featured: 'Рекомендуем', currency: 'zł', addToCart: 'В корзину' },
+  en: { all: 'All', wedding: 'Wedding', promo: 'Promo', handmade: 'Handmade', featured: 'Featured', currency: 'zł', addToCart: 'Add to cart' },
 };
 const t = labels[currentLocale] ?? labels.pl;
 ---
 
 <div class="catalog-wrapper">
-  <div class="price-filter">
-    <button class="filter-btn active" data-type="all">{t.all}</button>
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter-group="price" data-value="all">{t.all}</button>
     {ranges.map((r) => (
-      <button class="filter-btn" data-type="price" data-value={r}>{r}</button>
+      <button class="filter-btn" data-filter-group="price" data-value={r}>{r}</button>
     ))}
-    <button class="filter-btn" data-type="category" data-value="wedding">{t.wedding}</button>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter-group="category" data-value="all">{t.all}</button>
+    <button class="filter-btn" data-filter-group="category" data-value="wedding">{t.wedding}</button>
+    <button class="filter-btn" data-filter-group="category" data-value="promo">{t.promo}</button>
+    <button class="filter-btn" data-filter-group="category" data-value="handmade">{t.handmade}</button>
   </div>
 
   <div class="catalog-grid">
-    {products.map((product) => (
+    {products.map((product, index) => (
       <div
-        class="product-card"
+        class="product-card reveal"
+        style={`transition-delay: ${Math.min(index * 60, 300)}ms`}
         data-price-range={product.data.priceRange}
         data-wedding={product.data.wedding ? 'true' : 'false'}
+        data-promo={product.data.promo ? 'true' : 'false'}
+        data-handmade={product.data.handmade ? 'true' : 'false'}
       >
+        {product.data.featured && <span class="product-badge">{t.featured}</span>}
         <img src={`/images/products/${product.data.cover}`} alt={product.data.title[currentLocale]} class="product-img" />
         <h3 class="product-title">{product.data.title[currentLocale]}</h3>
         <p class="product-description">{product.data.description[currentLocale]}</p>
@@ -49,26 +59,38 @@ const t = labels[currentLocale] ?? labels.pl;
 </div>
 
 <script>
-  const buttons = document.querySelectorAll('.filter-btn');
+  const priceButtons = document.querySelectorAll('.filter-btn[data-filter-group="price"]');
+  const categoryButtons = document.querySelectorAll('.filter-btn[data-filter-group="category"]');
   const cards = document.querySelectorAll('.product-card');
 
-  buttons.forEach((btn) => {
+  let selectedPrice = 'all';
+  let selectedCategory = 'all';
+
+  function applyFilters() {
+    cards.forEach((card) => {
+      const priceMatch = selectedPrice === 'all' || card.getAttribute('data-price-range') === selectedPrice;
+      const categoryMatch =
+        selectedCategory === 'all' ||
+        card.getAttribute(`data-${selectedCategory}`) === 'true';
+      card.style.display = priceMatch && categoryMatch ? '' : 'none';
+    });
+  }
+
+  priceButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      buttons.forEach((b) => b.classList.remove('active'));
+      priceButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
+      selectedPrice = btn.getAttribute('data-value');
+      applyFilters();
+    });
+  });
 
-      const type = btn.getAttribute('data-type');
-      const value = btn.getAttribute('data-value');
-
-      cards.forEach((card) => {
-        let show = true;
-        if (type === 'price') {
-          show = card.getAttribute('data-price-range') === value;
-        } else if (type === 'category' && value === 'wedding') {
-          show = card.getAttribute('data-wedding') === 'true';
-        }
-        card.style.display = show ? '' : 'none';
-      });
+  categoryButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      categoryButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedCategory = btn.getAttribute('data-value');
+      applyFilters();
     });
   });
 
