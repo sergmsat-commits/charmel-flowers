@@ -10,5 +10,8 @@ description:
 price: 120
 priceRange: "100-200"
 cover: "candle-01.jpg"
+gallery:
+  - "candle-01-1.jpg"
+  - "candle-01-2.jpg"
 handmade: true
 ---

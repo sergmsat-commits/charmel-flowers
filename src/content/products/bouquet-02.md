@@ -10,4 +10,8 @@ description:
 price: 340
 priceRange: "200-400"
 cover: "bouquet-02.jpg"
+gallery:
+  - "bouquet-02-1.jpg"
+  - "bouquet-02-2.jpg"
+  - "bouquet-02-3.jpg"
 ---

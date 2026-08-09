@@ -20,6 +20,7 @@ const products = defineCollection({
     promo: z.boolean().optional().default(false),
     handmade: z.boolean().optional().default(false),
     cover: z.string(),
+    gallery: z.array(z.string()).optional().default([]),
     featured: z.boolean().optional().default(false),
   }),
 });

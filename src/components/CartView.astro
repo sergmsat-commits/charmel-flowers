@@ -5,8 +5,23 @@ const content = {
   pl: {
     title: 'Koszyk', empty: 'Twój koszyk jest pusty.', remove: 'Usuń', total: 'Razem',
     formTitle: 'Dane do zamówienia',
-    name: 'Imię i nazwisko', phone: 'Telefon', address: 'Adres dostawy',
-    date: 'Data dostawy', time: 'Godzina dostawy', comment: 'Komentarz (opcjonalnie)',
+    buyerHeading: 'Dane zamawiającego',
+    buyerName: 'Imię i nazwisko',
+    buyerPhone: 'Telefon',
+    recipientSelf: 'To zamówienie dla mnie (odbiorca = zamawiający)',
+    recipientHeading: 'Dane odbiorcy',
+    recipientName: 'Imię i nazwisko odbiorcy',
+    recipientPhone: 'Telefon odbiorcy',
+    fulfillmentLabel: 'Sposób odbioru',
+    deliveryOption: 'Dostawa',
+    pickupOption: 'Odbiór osobisty (Kabaty)',
+    address: 'Adres dostawy',
+    pickupNote: 'Odbiór pod adresem: Stryjeńskich 6/lok.UH1B, Kabaty',
+    date: 'Data', time: 'Godzina',
+    paymentLabel: 'Sposób płatności',
+    paymentBlik: 'BLIK',
+    paymentCash: 'Gotówka',
+    comment: 'Komentarz (opcjonalnie)',
     consent: 'Wyrażam zgodę na przetwarzanie moich danych osobowych w celu realizacji zamówienia (zgodnie z RODO).',
     submit: 'Złóż zamówienie', sending: 'Wysyłanie...',
     success: 'Dziękujemy! Twoje zamówienie zostało wysłane.',
@@ -15,8 +30,23 @@ const content = {
   ru: {
     title: 'Корзина', empty: 'Ваша корзина пуста.', remove: 'Удалить', total: 'Итого',
     formTitle: 'Данные для заказа',
-    name: 'Имя и фамилия', phone: 'Телефон', address: 'Адрес доставки',
-    date: 'Дата доставки', time: 'Время доставки', comment: 'Комментарий (необязательно)',
+    buyerHeading: 'Данные заказчика',
+    buyerName: 'Имя и фамилия',
+    buyerPhone: 'Телефон',
+    recipientSelf: 'Этот заказ для меня (получатель = заказчик)',
+    recipientHeading: 'Данные получателя',
+    recipientName: 'Имя и фамилия получателя',
+    recipientPhone: 'Телефон получателя',
+    fulfillmentLabel: 'Способ получения',
+    deliveryOption: 'Доставка',
+    pickupOption: 'Самовывоз (Кабаты)',
+    address: 'Адрес доставки',
+    pickupNote: 'Самовывоз по адресу: Stryjeńskich 6/lok.UH1B, Кабаты',
+    date: 'Дата', time: 'Время',
+    paymentLabel: 'Способ оплаты',
+    paymentBlik: 'BLIK',
+    paymentCash: 'Наличными',
+    comment: 'Комментарий (необязательно)',
     consent: 'Я даю согласие на обработку моих персональных данных для оформления заказа (в соответствии с RODO/GDPR).',
     submit: 'Оформить заказ', sending: 'Отправка...',
     success: 'Спасибо! Ваш заказ отправлен.',
@@ -25,8 +55,23 @@ const content = {
   en: {
     title: 'Cart', empty: 'Your cart is empty.', remove: 'Remove', total: 'Total',
     formTitle: 'Order details',
-    name: 'Full name', phone: 'Phone', address: 'Delivery address',
-    date: 'Delivery date', time: 'Delivery time', comment: 'Comment (optional)',
+    buyerHeading: "Orderer's details",
+    buyerName: 'Full name',
+    buyerPhone: 'Phone',
+    recipientSelf: 'This order is for me (recipient = orderer)',
+    recipientHeading: "Recipient's details",
+    recipientName: "Recipient's full name",
+    recipientPhone: "Recipient's phone",
+    fulfillmentLabel: 'Fulfillment method',
+    deliveryOption: 'Delivery',
+    pickupOption: 'Pickup (Kabaty)',
+    address: 'Delivery address',
+    pickupNote: 'Pickup at: Stryjeńskich 6/lok.UH1B, Kabaty',
+    date: 'Date', time: 'Time',
+    paymentLabel: 'Payment method',
+    paymentBlik: 'BLIK',
+    paymentCash: 'Cash',
+    comment: 'Comment (optional)',
     consent: 'I agree to the processing of my personal data for the purpose of order fulfillment (in accordance with GDPR).',
     submit: 'Place order', sending: 'Sending...',
     success: 'Thank you! Your order has been sent.',
@@ -47,20 +92,57 @@ const t = content[currentLocale] ?? content.pl;
   <form id="order-form" class="order-form">
     <h2>{t.formTitle}</h2>
 
-    <label>
-      {t.name}
-      <input type="text" name="name" required />
+    <h3 class="order-form-subheading">{t.buyerHeading}</h3>
+    <div class="order-form-row">
+      <label>
+        {t.buyerName}
+        <input type="text" name="buyerName" id="buyer-name-input" required />
+      </label>
+      <label>
+        {t.buyerPhone}
+        <input type="tel" name="buyerPhone" id="buyer-phone-input" required />
+      </label>
+    </div>
+
+    <label class="order-form-checkbox">
+      <input type="checkbox" name="recipientIsMe" id="recipient-is-me" />
+      <span>{t.recipientSelf}</span>
     </label>
 
-    <label>
-      {t.phone}
-      <input type="tel" name="phone" required />
-    </label>
+    <div id="recipient-fields">
+      <h3 class="order-form-subheading">{t.recipientHeading}</h3>
+      <div class="order-form-row">
+        <label>
+          {t.recipientName}
+          <input type="text" name="recipientName" id="recipient-name-input" required />
+        </label>
+        <label>
+          {t.recipientPhone}
+          <input type="tel" name="recipientPhone" id="recipient-phone-input" required />
+        </label>
+      </div>
+    </div>
 
-    <label>
+    <div class="order-form-field">
+      <span class="field-label">{t.fulfillmentLabel}</span>
+      <div class="toggle-group" data-group="fulfillment">
+        <label class="toggle-option active">
+          <input type="radio" name="fulfillment" value="delivery" checked />
+          {t.deliveryOption}
+        </label>
+        <label class="toggle-option">
+          <input type="radio" name="fulfillment" value="pickup" />
+          {t.pickupOption}
+        </label>
+      </div>
+    </div>
+
+    <label id="recipient-address-field">
       {t.address}
-      <input type="text" name="address" required />
+      <input type="text" name="recipientAddress" id="recipient-address-input" required />
     </label>
+
+    <p id="pickup-note" class="pickup-note" style="display:none;">{t.pickupNote}</p>
 
     <div class="order-form-row">
       <label>
@@ -72,6 +154,20 @@ const t = content[currentLocale] ?? content.pl;
         {t.time}
         <input type="time" name="time" min="09:00" max="21:00" required />
       </label>
+    </div>
+
+    <div class="order-form-field">
+      <span class="field-label">{t.paymentLabel}</span>
+      <div class="toggle-group" data-group="payment">
+        <label class="toggle-option active">
+          <input type="radio" name="payment" value="blik" checked />
+          {t.paymentBlik}
+        </label>
+        <label class="toggle-option">
+          <input type="radio" name="payment" value="cash" />
+          {t.paymentCash}
+        </label>
+      </div>
     </div>
 
     <label>
@@ -89,9 +185,9 @@ const t = content[currentLocale] ?? content.pl;
   </form>
 </section>
 
-<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error }}>
+<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error, paymentBlikLabel: t.paymentBlik, paymentCashLabel: t.paymentCash, pickupNoteText: t.pickupNote }}>
   // TODO: перед деплоем заменить на токен и chat_id НОВОГО бота Charmel Flowers
-  const BOT_TOKEN = '8830224963:AAH6Ys9RiSz6ngBd6s7Q_4LjSDlJP7l1OZI';
+  const BOT_TOKEN = '8747627753:AAESE4LS6x6uN2ZszncOJ5yDiLcsuLuD3OI';
   const CHAT_ID = '1875800818';
 
   function renderCart() {
@@ -162,6 +258,43 @@ const t = content[currentLocale] ?? content.pl;
   });
   window.addEventListener('cart:updated', renderCart);
 
+  // "Это заказ для меня" — скрывает поля получателя
+  const selfCheckbox = document.getElementById('recipient-is-me');
+  const recipientFields = document.getElementById('recipient-fields');
+  const recipientNameInput = document.getElementById('recipient-name-input');
+  const recipientPhoneInput = document.getElementById('recipient-phone-input');
+  if (selfCheckbox) {
+    selfCheckbox.addEventListener('change', () => {
+      const isSelf = selfCheckbox.checked;
+      recipientFields.style.display = isSelf ? 'none' : '';
+      recipientNameInput.required = !isSelf;
+      recipientPhoneInput.required = !isSelf;
+    });
+  }
+
+  // Переключатели (доставка/самовывоз, BLIK/наличные) — единый стиль пилюль
+  document.querySelectorAll('.toggle-group').forEach((group) => {
+    const options = group.querySelectorAll('.toggle-option');
+    options.forEach((opt) => {
+      opt.addEventListener('click', () => {
+        options.forEach((o) => o.classList.remove('active'));
+        opt.classList.add('active');
+        opt.querySelector('input').checked = true;
+
+        if (group.getAttribute('data-group') === 'fulfillment') {
+          const value = opt.querySelector('input').value;
+          const addressField = document.getElementById('recipient-address-field');
+          const addressInput = document.getElementById('recipient-address-input');
+          const pickupNote = document.getElementById('pickup-note');
+          const isPickup = value === 'pickup';
+          addressField.style.display = isPickup ? 'none' : '';
+          addressInput.required = !isPickup;
+          pickupNote.style.display = isPickup ? 'block' : 'none';
+        }
+      });
+    });
+  });
+
   const orderForm = document.getElementById('order-form');
   if (orderForm) {
     orderForm.addEventListener('submit', async (e) => {
@@ -174,7 +307,22 @@ const t = content[currentLocale] ?? content.pl;
       const itemsText = cart.map((i) => `- ${i.title} x${i.qty} — ${i.price * i.qty} zł`).join('\n');
       const total = window.AuraCart.getTotal();
 
-      const text = `🌸 Новый заказ (Charmel Flowers)\n\n${itemsText}\n\nИтого: ${total} zł\n\nИмя: ${formData.get('name')}\nТелефон: ${formData.get('phone')}\nАдрес: ${formData.get('address')}\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nКомментарий: ${formData.get('comment') || '—'}\nСогласие на обработку данных: получено`;
+      const isSelf = formData.get('recipientIsMe') === 'on';
+      const buyerName = formData.get('buyerName');
+      const buyerPhone = formData.get('buyerPhone');
+      const recipientName = isSelf ? buyerName : formData.get('recipientName');
+      const recipientPhone = isSelf ? buyerPhone : formData.get('recipientPhone');
+
+      const fulfillment = formData.get('fulfillment');
+      const fulfillmentLabel = fulfillment === 'pickup' ? 'Самовывоз (Кабаты)' : 'Доставка';
+      const addressLine = fulfillment === 'pickup'
+        ? pickupNoteText
+        : `Адрес доставки: ${formData.get('recipientAddress')}`;
+
+      const payment = formData.get('payment');
+      const paymentLabel = payment === 'blik' ? paymentBlikLabel : paymentCashLabel;
+
+      const text = `🌸 Новый заказ (Charmel Flowers)\n\n${itemsText}\n\nИтого: ${total} zł\n\n— Заказчик —\nИмя: ${buyerName}\nТелефон: ${buyerPhone}\n\n— Получатель —\nИмя: ${recipientName}\nТелефон: ${recipientPhone}\n\nСпособ получения: ${fulfillmentLabel}\n${addressLine}\n\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nОплата: ${paymentLabel}\nКомментарий: ${formData.get('comment') || '—'}\nСогласие на обработку данных: получено`;
 
       submitBtn.disabled = true;
       submitBtn.textContent = sendingLabel;

@@ -98,6 +98,16 @@ const f = footer[currentLocale] ?? footer.pl;
       }, { threshold: 0.1 });
 
       revealEls.forEach((el) => observer.observe(el));
+
+      const menuToggle = document.getElementById('mobile-menu-toggle');
+      const navDropdown = document.getElementById('nav-dropdown');
+      if (menuToggle && navDropdown) {
+        menuToggle.addEventListener('click', () => {
+          const isOpen = navDropdown.classList.toggle('is-open');
+          menuToggle.classList.toggle('is-active', isOpen);
+          menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+      }
     });
   </script>
 </head>
@@ -109,22 +119,29 @@ const f = footer[currentLocale] ?? footer.pl;
         <span class="logo-text">Charmel Flowers</span>
       </a>
 
-      <nav class="main-nav">
-        <a href={getRelativeLocaleUrl(currentLocale, '/')}>{nav.home}</a>
-        <a href={getRelativeLocaleUrl(currentLocale, '/catalog')}>{nav.catalog}</a>
-        <a href={getRelativeLocaleUrl(currentLocale, '/about')}>{nav.about}</a>
-        <a href={getRelativeLocaleUrl(currentLocale, '/contact')}>{nav.contact}</a>
-      </nav>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <nav class="main-nav">
+          <a href={getRelativeLocaleUrl(currentLocale, '/')}>{nav.home}</a>
+          <a href={getRelativeLocaleUrl(currentLocale, '/catalog')}>{nav.catalog}</a>
+          <a href={getRelativeLocaleUrl(currentLocale, '/about')}>{nav.about}</a>
+          <a href={getRelativeLocaleUrl(currentLocale, '/contact')}>{nav.contact}</a>
+        </nav>
 
-      <div class="lang-switcher">
-        <a href={getRelativeLocaleUrl('pl', pathWithoutLocale)} class={currentLocale === 'pl' ? 'active' : ''}>PL</a>
-        <a href={getRelativeLocaleUrl('ru', pathWithoutLocale)} class={currentLocale === 'ru' ? 'active' : ''}>RU</a>
-        <a href={getRelativeLocaleUrl('en', pathWithoutLocale)} class={currentLocale === 'en' ? 'active' : ''}>EN</a>
+        <div class="lang-switcher">
+          <a href={getRelativeLocaleUrl('pl', pathWithoutLocale)} class={currentLocale === 'pl' ? 'active' : ''}>PL</a>
+          <a href={getRelativeLocaleUrl('ru', pathWithoutLocale)} class={currentLocale === 'ru' ? 'active' : ''}>RU</a>
+          <a href={getRelativeLocaleUrl('en', pathWithoutLocale)} class={currentLocale === 'en' ? 'active' : ''}>EN</a>
+        </div>
       </div>
 
-      <a href={getRelativeLocaleUrl(currentLocale, '/cart')} class="cart-link" aria-label="Cart">
-        🛒 <span data-cart-count>0</span>
-      </a>
+      <div class="header-right">
+        <a href={getRelativeLocaleUrl(currentLocale, '/cart')} class="cart-link" aria-label="Cart">
+          🛒 <span data-cart-count>0</span>
+        </a>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
   </header>
 

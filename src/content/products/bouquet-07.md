@@ -10,5 +10,8 @@ description:
 price: 650
 priceRange: "600-800"
 cover: "bouquet-07.jpg"
+gallery:
+  - "bouquet-07-1.jpg"
+  - "bouquet-07-2.jpg"
 wedding: true
 ---

@@ -10,5 +10,8 @@ description:
 price: 140
 priceRange: "100-200"
 cover: "hyacinth-01.jpg"
+gallery:
+  - "hyacinth-01-1.jpg"
+  - "hyacinth-01-2.jpg"
 handmade: true
 ---
