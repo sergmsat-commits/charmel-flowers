@@ -1,6 +1,9 @@
 ---
 const currentLocale = Astro.currentLocale ?? 'pl';
 
+const botToken = import.meta.env.PUBLIC_TELEGRAM_BOT_TOKEN ?? '';
+const chatId = import.meta.env.PUBLIC_TELEGRAM_CHAT_ID ?? '';
+
 const content = {
   pl: {
     title: 'Koszyk', empty: 'Twój koszyk jest pusty.', remove: 'Usuń', total: 'Razem',
@@ -185,10 +188,9 @@ const t = content[currentLocale] ?? content.pl;
   </form>
 </section>
 
-<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error, paymentBlikLabel: t.paymentBlik, paymentCashLabel: t.paymentCash, pickupNoteText: t.pickupNote }}>
-  // TODO: перед деплоем заменить на токен и chat_id НОВОГО бота Charmel Flowers
-  const BOT_TOKEN = '8747627753:AAESE4LS6x6uN2ZszncOJ5yDiLcsuLuD3OI';
-  const CHAT_ID = '1875800818';
+<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error, paymentBlikLabel: t.paymentBlik, paymentCashLabel: t.paymentCash, pickupNoteText: t.pickupNote, botToken, chatId }}>
+  const BOT_TOKEN = botToken;
+  const CHAT_ID = chatId;
 
   function renderCart() {
     if (!window.AuraCart) return;
