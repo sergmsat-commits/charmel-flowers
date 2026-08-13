@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { getRelativeLocaleUrl } from 'astro:i18n';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 const products = await getCollection('products');
@@ -44,13 +45,23 @@ const t = labels[currentLocale] ?? labels.pl;
           data-handmade={product.data.handmade ? 'true' : 'false'}
         >
           {product.data.featured && <span class="product-badge">{t.featured}</span>}
+          <button
+            class="favorite-btn"
+            data-favorite-id={product.id}
+            data-favorite-title={product.data.title[currentLocale]}
+            data-favorite-price={product.data.price}
+            data-favorite-cover={product.data.cover}
+            aria-label="Favorite"
+          >♥</button>
           <img
             src={`/images/products/${product.data.cover}`}
             alt={product.data.title[currentLocale]}
             class="product-img lightbox-trigger"
             data-images={allImages}
           />
-          <h3 class="product-title">{product.data.title[currentLocale]}</h3>
+          <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-title-link">
+            <h3 class="product-title">{product.data.title[currentLocale]}</h3>
+          </a>
           <p class="product-description">{product.data.description[currentLocale]}</p>
           <p class="product-price">{product.data.price} {t.currency}</p>
           <button
@@ -118,6 +129,25 @@ const t = labels[currentLocale] ?? labels.pl;
       setTimeout(() => {
         btn.textContent = originalText;
       }, 1000);
+    });
+  });
+
+  document.querySelectorAll('.favorite-btn').forEach((btn) => {
+    const id = btn.getAttribute('data-favorite-id');
+    if (window.CharmelFavorites && window.CharmelFavorites.isFavorite(id)) {
+      btn.classList.add('is-active');
+    }
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!window.CharmelFavorites) return;
+      const item = {
+        id,
+        title: btn.getAttribute('data-favorite-title'),
+        price: Number(btn.getAttribute('data-favorite-price')),
+        cover: btn.getAttribute('data-favorite-cover'),
+      };
+      const nowActive = window.CharmelFavorites.toggleFavorite(item);
+      btn.classList.toggle('is-active', nowActive);
     });
   });
 </script>

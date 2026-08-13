@@ -2,7 +2,14 @@
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import '../styles/global.css';
 
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title: customTitle, description: customDescription } = Astro.props;
+
 const currentLocale = Astro.currentLocale ?? 'pl';
+const locales = ['pl', 'ru', 'en'];
 
 let pathWithoutLocale = Astro.url.pathname.replace(/^\/(ru|en)(?=\/|$)/, '');
 if (pathWithoutLocale === '') pathWithoutLocale = '/';
@@ -29,6 +36,8 @@ const meta = {
   },
 };
 const m = meta[currentLocale] ?? meta.pl;
+const pageTitle = customTitle ?? m.title;
+const pageDescription = customDescription ?? m.description;
 
 const footer = {
   pl: {
@@ -76,13 +85,14 @@ const f = footer[currentLocale] ?? footer.pl;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>{m.title}</title>
-  <meta name="description" content={m.description} />
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
   <link rel="icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <script is:inline>document.documentElement.classList.add('js-ready');</script>
   <script src="/cart.js" defer></script>
+  <script src="/favorites.js" defer></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const revealEls = document.querySelectorAll('.reveal');
@@ -106,6 +116,22 @@ const f = footer[currentLocale] ?? footer.pl;
           const isOpen = navDropdown.classList.toggle('is-open');
           menuToggle.classList.toggle('is-active', isOpen);
           menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+      }
+
+      const langCurrentBtn = document.getElementById('lang-current-btn');
+      const langOptions = document.getElementById('lang-options');
+      const langSwitcher = document.getElementById('lang-switcher');
+      if (langCurrentBtn && langOptions) {
+        langCurrentBtn.addEventListener('click', () => {
+          const isOpen = langOptions.classList.toggle('is-open');
+          langCurrentBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        document.addEventListener('click', (e) => {
+          if (langSwitcher && !langSwitcher.contains(e.target)) {
+            langOptions.classList.remove('is-open');
+            langCurrentBtn.setAttribute('aria-expanded', 'false');
+          }
         });
       }
 
@@ -170,6 +196,10 @@ const f = footer[currentLocale] ?? footer.pl;
   </script>
 </head>
 <body>
+  <div class="top-bar">
+    <a href="tel:+48514011410" class="top-bar-phone">📞 +48 514 011 410</a>
+  </div>
+
   <header class="site-header">
     <div class="header-inner">
       <a href={getRelativeLocaleUrl(currentLocale, '/')} class="logo-link">
@@ -187,12 +217,20 @@ const f = footer[currentLocale] ?? footer.pl;
       </div>
 
       <div class="header-right">
-        <div class="lang-switcher">
-          <a href={getRelativeLocaleUrl('pl', pathWithoutLocale)} class={currentLocale === 'pl' ? 'active' : ''}>PL</a>
-          <a href={getRelativeLocaleUrl('ru', pathWithoutLocale)} class={currentLocale === 'ru' ? 'active' : ''}>RU</a>
-          <a href={getRelativeLocaleUrl('en', pathWithoutLocale)} class={currentLocale === 'en' ? 'active' : ''}>EN</a>
+        <div class="lang-switcher" id="lang-switcher">
+          <button class="lang-current" id="lang-current-btn" aria-expanded="false">
+            {currentLocale.toUpperCase()} <span class="lang-arrow">▾</span>
+          </button>
+          <div class="lang-options" id="lang-options">
+            {locales.filter((l) => l !== currentLocale).map((l) => (
+              <a href={getRelativeLocaleUrl(l, pathWithoutLocale)}>{l.toUpperCase()}</a>
+            ))}
+          </div>
         </div>
 
+        <a href={getRelativeLocaleUrl(currentLocale, '/favorites')} class="favorites-link" aria-label="Favorites">
+          ♥ <span data-favorites-count>0</span>
+        </a>
         <a href={getRelativeLocaleUrl(currentLocale, '/cart')} class="cart-link" aria-label="Cart">
           🛒 <span data-cart-count>0</span>
         </a>

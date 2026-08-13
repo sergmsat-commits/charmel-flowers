@@ -213,7 +213,7 @@ const t = content[currentLocale] ?? content.pl;
         const row = document.createElement('div');
         row.className = 'cart-row';
         row.innerHTML = `
-          <img src="/images/products/${item.cover}" alt="${item.title}" class="cart-row-img" />
+          <img src="${item.id.startsWith('addon-') ? '/images/addons/' : '/images/products/'}${item.cover}" alt="${item.title}" class="cart-row-img" />
           <div class="cart-row-info">
             <p class="cart-row-title">${item.title}</p>
             <p class="cart-row-price">${item.price} zł</p>

@@ -1,0 +1,178 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const { product } = Astro.props;
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const labels = {
+  pl: {
+    addToCart: 'Dodaj do koszyka',
+    addons: 'Dodatki do bukietu',
+    showMore: 'Zobacz więcej dodatków',
+    showLess: 'Pokaż mniej',
+    backToCatalog: '← Powrót do katalogu',
+    currency: 'zł',
+  },
+  ru: {
+    addToCart: 'Добавить в корзину',
+    addons: 'Дополнения к букету',
+    showMore: 'Смотрите также',
+    showLess: 'Скрыть',
+    backToCatalog: '← Назад в каталог',
+    currency: 'zł',
+  },
+  en: {
+    addToCart: 'Add to cart',
+    addons: 'Bouquet add-ons',
+    showMore: 'See more',
+    showLess: 'Show less',
+    backToCatalog: '← Back to catalog',
+    currency: 'zł',
+  },
+};
+const t = labels[currentLocale] ?? labels.pl;
+
+const addons = [
+  { id: 'addon-aquabox', cover: 'aquabox.jpg', price: 15, title: { pl: 'Aquabox', ru: 'Аквабокс', en: 'Aqua box' } },
+  { id: 'addon-card', cover: 'card.jpg', price: 10, title: { pl: 'Kartka okolicznościowa', ru: 'Открытка', en: 'Greeting card' } },
+  { id: 'addon-secateurs', cover: 'secateurs.jpg', price: 45, title: { pl: 'Sekator florystyczny', ru: 'Секатор флористический', en: 'Florist pruning shears' } },
+  { id: 'addon-vase-xl', cover: 'vase-xl.jpg', price: 120, title: { pl: 'Wazon XL', ru: 'Ваза XL', en: 'XL Vase' } },
+  { id: 'addon-kenzan-ring', cover: 'kenzan-ring.jpg', price: 150, title: { pl: 'Uchwyt Kenzan Ring 70mm', ru: 'Держатель Kenzan Ring 70mm', en: 'Kenzan Ring Holder 70mm' } },
+  { id: 'addon-chocolates-merci', cover: 'chocolates-merci.jpg', price: 26, title: { pl: 'Czekoladki Merci', ru: 'Шоколадки Merci', en: 'Merci Chocolates' } },
+  { id: 'addon-flower-bag', cover: 'flower-bag.jpg', price: 25, title: { pl: 'Torba na kwiaty', ru: 'Пакет для цветов', en: 'Flower gift bag' } },
+  { id: 'addon-macarons', cover: 'macarons.jpg', price: 105, title: { pl: 'Makaroniki 12 szt.', ru: 'Макаруны 12 шт.', en: 'Macarons, 12 pcs' } },
+  { id: 'addon-raffaello', cover: 'raffaello.jpg', price: 25, title: { pl: 'Cukierki Raffaello', ru: 'Конфеты Raffaello', en: 'Raffaello Sweets' } },
+  { id: 'addon-teddy-bear', cover: 'teddy-bear.jpg', price: 59, title: { pl: 'Pluszowy miś', ru: 'Плюшевый мишка', en: 'Teddy Bear' } },
+];
+
+const visibleAddons = addons.slice(0, 4);
+const hiddenAddons = addons.slice(4);
+
+const allImages = [product.data.cover, ...product.data.gallery]
+  .map((f) => `/images/products/${f}`)
+  .join(',');
+
+const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
+---
+
+<section class="product-detail">
+  <a href={catalogUrl} class="product-detail-back">{t.backToCatalog}</a>
+
+  <div class="product-detail-layout">
+    <div class="product-detail-image">
+      <img
+        src={`/images/products/${product.data.cover}`}
+        alt={product.data.title[currentLocale]}
+        class="lightbox-trigger"
+        data-images={allImages}
+      />
+    </div>
+
+    <div class="product-detail-info">
+      <h1>{product.data.title[currentLocale]}</h1>
+      <p class="product-detail-description">{product.data.description[currentLocale]}</p>
+      <p class="product-detail-price">{product.data.price} {t.currency}</p>
+
+      <div class="addon-section">
+        <h2>{t.addons}</h2>
+        <div class="addon-grid">
+          {visibleAddons.map((addon) => (
+            <label class="addon-item">
+              <input
+                type="checkbox"
+                class="addon-checkbox"
+                data-addon-id={addon.id}
+                data-addon-title={addon.title[currentLocale]}
+                data-addon-price={addon.price}
+                data-addon-cover={addon.cover}
+              />
+              <img src={`/images/addons/${addon.cover}`} alt={addon.title[currentLocale]} />
+              <span class="addon-item-title">{addon.title[currentLocale]}</span>
+              <span class="addon-item-price">+{addon.price} {t.currency}</span>
+            </label>
+          ))}
+        </div>
+
+        <div class="addon-grid" id="addon-grid-hidden" style="display:none;">
+          {hiddenAddons.map((addon) => (
+            <label class="addon-item">
+              <input
+                type="checkbox"
+                class="addon-checkbox"
+                data-addon-id={addon.id}
+                data-addon-title={addon.title[currentLocale]}
+                data-addon-price={addon.price}
+                data-addon-cover={addon.cover}
+              />
+              <img src={`/images/addons/${addon.cover}`} alt={addon.title[currentLocale]} />
+              <span class="addon-item-title">{addon.title[currentLocale]}</span>
+              <span class="addon-item-price">+{addon.price} {t.currency}</span>
+            </label>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          class="addon-toggle-btn"
+          id="addon-toggle-btn"
+          data-show-more={t.showMore}
+          data-show-less={t.showLess}
+        >
+          {t.showMore}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="add-to-cart-btn product-detail-add-btn"
+        id="product-detail-add-btn"
+        data-id={product.id}
+        data-title={product.data.title[currentLocale]}
+        data-price={product.data.price}
+        data-cover={product.data.cover}
+      >
+        {t.addToCart}
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const toggleBtn = document.getElementById('addon-toggle-btn');
+  const hiddenGrid = document.getElementById('addon-grid-hidden');
+  if (toggleBtn && hiddenGrid) {
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = hiddenGrid.style.display === 'none';
+      hiddenGrid.style.display = isHidden ? '' : 'none';
+      toggleBtn.textContent = isHidden
+        ? toggleBtn.getAttribute('data-show-less')
+        : toggleBtn.getAttribute('data-show-more');
+    });
+  }
+
+  const addBtn = document.getElementById('product-detail-add-btn');
+  if (addBtn) {
+    const originalText = addBtn.textContent;
+    addBtn.addEventListener('click', () => {
+      if (!window.AuraCart) return;
+      window.AuraCart.addItem({
+        id: addBtn.getAttribute('data-id'),
+        title: addBtn.getAttribute('data-title'),
+        price: Number(addBtn.getAttribute('data-price')),
+        cover: addBtn.getAttribute('data-cover'),
+      });
+      document.querySelectorAll('.addon-checkbox:checked').forEach((cb) => {
+        window.AuraCart.addItem({
+          id: cb.getAttribute('data-addon-id'),
+          title: cb.getAttribute('data-addon-title'),
+          price: Number(cb.getAttribute('data-addon-price')),
+          cover: cb.getAttribute('data-addon-cover'),
+        });
+      });
+      addBtn.textContent = '✓';
+      setTimeout(() => {
+        addBtn.textContent = originalText;
+      }, 1200);
+    });
+  }
+</script>

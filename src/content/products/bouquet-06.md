@@ -14,4 +14,5 @@ gallery:
   - "bouquet-06-1.jpg"
   - "bouquet-06-2.jpg"
 promo: true
+featured: true
 ---

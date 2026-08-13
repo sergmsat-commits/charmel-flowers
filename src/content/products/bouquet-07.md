@@ -14,4 +14,5 @@ gallery:
   - "bouquet-07-1.jpg"
   - "bouquet-07-2.jpg"
 wedding: true
+featured: true
 ---

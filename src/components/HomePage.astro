@@ -2,6 +2,8 @@
 import AboutUs from './AboutUs.astro';
 import Reviews from './Reviews.astro';
 import LocationMap from './LocationMap.astro';
+import PromoSlider from './PromoSlider.astro';
+import FeaturedStrip from './FeaturedStrip.astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
@@ -43,6 +45,8 @@ const t = hero[currentLocale] ?? hero.pl;
   </div>
 </section>
 
+<PromoSlider />
+<FeaturedStrip />
 <AboutUs />
 <Reviews />
 <LocationMap />

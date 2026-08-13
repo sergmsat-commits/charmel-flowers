@@ -1,0 +1,97 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'Ulubione',
+    empty: 'Nie masz jeszcze ulubionych produktów.',
+    browseCatalog: 'Przeglądaj katalog',
+    remove: 'Usuń',
+    addToCart: 'Do koszyka',
+  },
+  ru: {
+    title: 'Избранное',
+    empty: 'У вас пока нет избранных товаров.',
+    browseCatalog: 'Смотреть каталог',
+    remove: 'Удалить',
+    addToCart: 'В корзину',
+  },
+  en: {
+    title: 'Favorites',
+    empty: "You don't have any favorite products yet.",
+    browseCatalog: 'Browse catalog',
+    remove: 'Remove',
+    addToCart: 'Add to cart',
+  },
+};
+const t = content[currentLocale] ?? content.pl;
+const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
+---
+
+<section class="favorites-section">
+  <h1>{t.title}</h1>
+  <div id="favorites-items" class="favorites-grid"></div>
+  <p id="favorites-empty-msg" class="cart-empty" style="display:none;">
+    {t.empty} <a href={catalogUrl}>{t.browseCatalog}</a>
+  </p>
+</section>
+
+<script define:vars={{ removeLabel: t.remove, addToCartLabel: t.addToCart, currency: 'zł' }}>
+  function renderFavorites() {
+    if (!window.CharmelFavorites) return;
+    const favorites = window.CharmelFavorites.getFavorites();
+    const container = document.getElementById('favorites-items');
+    const emptyMsg = document.getElementById('favorites-empty-msg');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (favorites.length === 0) {
+      emptyMsg.style.display = 'block';
+      return;
+    }
+    emptyMsg.style.display = 'none';
+
+    favorites.forEach((item) => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = `
+        <img src="/images/products/${item.cover}" alt="${item.title}" class="product-img" />
+        <h3 class="product-title">${item.title}</h3>
+        <p class="product-price">${item.price} ${currency}</p>
+        <button type="button" class="add-to-cart-btn" data-id="${item.id}" data-title="${item.title}" data-price="${item.price}" data-cover="${item.cover}">${addToCartLabel}</button>
+        <button type="button" class="favorites-remove-btn" data-id="${item.id}">${removeLabel}</button>
+      `;
+      container.appendChild(card);
+    });
+
+    container.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+      const originalText = btn.textContent;
+      btn.addEventListener('click', () => {
+        if (!window.AuraCart) return;
+        window.AuraCart.addItem({
+          id: btn.getAttribute('data-id'),
+          title: btn.getAttribute('data-title'),
+          price: Number(btn.getAttribute('data-price')),
+          cover: btn.getAttribute('data-cover'),
+        });
+        btn.textContent = '✓';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 1000);
+      });
+    });
+
+    container.querySelectorAll('.favorites-remove-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        window.CharmelFavorites.removeFavorite(btn.getAttribute('data-id'));
+        renderFavorites();
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', renderFavorites);
+  window.addEventListener('favorites:updated', renderFavorites);
+</script>

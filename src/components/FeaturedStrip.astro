@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+const allProducts = await getCollection('products');
+const featured = allProducts.filter((p) => p.data.featured);
+
+const labels = {
+  pl: { title: 'Polecane', currency: 'zł' },
+  ru: { title: 'Рекомендуем', currency: 'zł' },
+  en: { title: 'Recommended', currency: 'zł' },
+};
+const t = labels[currentLocale] ?? labels.pl;
+const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
+---
+
+{featured.length > 0 && (
+  <section class="featured-strip">
+    <h2 class="featured-strip-title">{t.title}</h2>
+    <div class="featured-track-wrapper">
+      <div class="featured-track">
+        {featured.map((product) => (
+          <a href={catalogUrl} class="featured-mini-card">
+            <img src={`/images/products/${product.data.cover}`} alt={product.data.title[currentLocale]} />
+            <p class="featured-mini-title">{product.data.title[currentLocale]}</p>
+            <p class="featured-mini-price">{product.data.price} {t.currency}</p>
+          </a>
+        ))}
+        {featured.map((product) => (
+          <a href={catalogUrl} class="featured-mini-card" aria-hidden="true">
+            <img src={`/images/products/${product.data.cover}`} alt={product.data.title[currentLocale]} />
+            <p class="featured-mini-title">{product.data.title[currentLocale]}</p>
+            <p class="featured-mini-price">{product.data.price} {t.currency}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

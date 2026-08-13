@@ -1,0 +1,76 @@
+---
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const slides = {
+  pl: [
+    '⚡ Gotowe w 15 minut',
+    '🚗 Dostawa Uber/Wolt po całej Warszawie',
+    '⭐ 4.9 na Google — 78 zadowolonych klientów',
+  ],
+  ru: [
+    '⚡ Готово за 15 минут',
+    '🚗 Доставка Uber/Wolt по всей Варшаве',
+    '⭐ 4.9 на Google — 78 довольных клиентов',
+  ],
+  en: [
+    '⚡ Ready in 15 minutes',
+    '🚗 Uber/Wolt delivery across Warsaw',
+    '⭐ 4.9 on Google — 78 happy customers',
+  ],
+};
+const t = slides[currentLocale] ?? slides.pl;
+---
+
+<section class="promo-slider">
+  <div class="promo-track" id="promo-track">
+    {t.map((text) => (
+      <div class="promo-slide">{text}</div>
+    ))}
+  </div>
+  <div class="promo-dots" id="promo-dots">
+    {t.map((_, i) => (
+      <button class={`promo-dot ${i === 0 ? 'active' : ''}`} data-index={i} aria-label={`Slide ${i + 1}`}></button>
+    ))}
+  </div>
+</section>
+
+<script>
+  const track = document.getElementById('promo-track');
+  const dots = document.querySelectorAll('.promo-dot');
+  const slider = document.querySelector('.promo-slider');
+  let current = 0;
+  let timer;
+
+  function goTo(index) {
+    current = index;
+    track.style.transform = `translateX(-${index * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  function next() {
+    goTo((current + 1) % dots.length);
+  }
+
+  function start() {
+    timer = setInterval(next, 4000);
+  }
+
+  function stop() {
+    clearInterval(timer);
+  }
+
+  dots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      goTo(Number(dot.getAttribute('data-index')));
+      stop();
+      start();
+    });
+  });
+
+  if (slider) {
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
+  }
+
+  start();
+</script>
