@@ -458,6 +458,10 @@ h1, h2, h3, h4 {
   display: block;
 }
 
+.product-image-link {
+  display: block;
+}
+
 .product-title-link {
   display: block;
   color: inherit;

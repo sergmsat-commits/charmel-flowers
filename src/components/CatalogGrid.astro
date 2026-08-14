@@ -31,11 +31,7 @@ const t = labels[currentLocale] ?? labels.pl;
   </div>
 
   <div class="catalog-grid">
-    {products.map((product, index) => {
-      const allImages = [product.data.cover, ...product.data.gallery]
-        .map((f) => `/images/products/${f}`)
-        .join(',');
-      return (
+    {products.map((product, index) => (
         <div
           class="product-card reveal"
           style={`transition-delay: ${Math.min(index * 60, 300)}ms`}
@@ -53,12 +49,13 @@ const t = labels[currentLocale] ?? labels.pl;
             data-favorite-cover={product.data.cover}
             aria-label="Favorite"
           >♥</button>
-          <img
-            src={`/images/products/${product.data.cover}`}
-            alt={product.data.title[currentLocale]}
-            class="product-img lightbox-trigger"
-            data-images={allImages}
-          />
+          <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-image-link">
+            <img
+              src={`/images/products/${product.data.cover}`}
+              alt={product.data.title[currentLocale]}
+              class="product-img"
+            />
+          </a>
           <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-title-link">
             <h3 class="product-title">{product.data.title[currentLocale]}</h3>
           </a>
@@ -74,8 +71,7 @@ const t = labels[currentLocale] ?? labels.pl;
             {t.addToCart}
           </button>
         </div>
-      );
-    })}
+    ))}
   </div>
 </div>
 
