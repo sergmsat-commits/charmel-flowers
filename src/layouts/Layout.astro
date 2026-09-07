@@ -78,6 +78,33 @@ const footer = {
   },
 };
 const f = footer[currentLocale] ?? footer.pl;
+
+const businessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Florist',
+  name: 'Charmel Flowers',
+  image: 'https://charmelflowers.pl/images/logo-charmel.jpg',
+  url: 'https://charmelflowers.pl',
+  telephone: '+48514011410',
+  priceRange: '100-1350 PLN',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Stryjeńskich 6/lok.UH1B',
+    addressLocality: 'Warszawa',
+    postalCode: '02-791',
+    addressCountry: 'PL',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 52.1329367,
+    longitude: 21.0575091,
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '10:00', closes: '20:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '10:00', closes: '18:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Sunday', opens: '10:00', closes: '17:00' },
+  ],
+};
 ---
 
 <html lang={currentLocale}>
@@ -89,6 +116,7 @@ const f = footer[currentLocale] ?? footer.pl;
   <link rel="icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
   <script is:inline>document.documentElement.classList.add('js-ready');</script>
   <script src="/cart.js" defer></script>
   <script src="/favorites.js" defer></script>

@@ -53,9 +53,26 @@ const allImages = [product.data.cover, ...product.data.gallery]
   .join(',');
 
 const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
+
+const productUrl = `https://charmelflowers.pl${Astro.url.pathname}`;
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.data.title[currentLocale],
+  description: product.data.description[currentLocale],
+  image: `https://charmelflowers.pl/images/products/${product.data.cover}`,
+  offers: {
+    '@type': 'Offer',
+    price: product.data.price,
+    priceCurrency: 'PLN',
+    availability: 'https://schema.org/InStock',
+    url: productUrl,
+  },
+};
 ---
 
 <section class="product-detail">
+  <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
   <a href={catalogUrl} class="product-detail-back">{t.backToCatalog}</a>
 
   <div class="product-detail-layout">
