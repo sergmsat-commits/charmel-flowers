@@ -9,6 +9,11 @@ description:
   en: "Sunflowers, white blooms and eucalyptus sprigs in a natural, summery style."
 price: 160
 priceRange: "100-200"
+size: "S"
+composition:
+  - "sunflower"
+  - "chamomile"
+  - "eucalyptus"
 cover: "bouquet-01.jpg"
 gallery:
   - "bouquet-01-1.jpg"

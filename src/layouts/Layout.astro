@@ -15,9 +15,9 @@ let pathWithoutLocale = Astro.url.pathname.replace(/^\/(ru|en)(?=\/|$)/, '');
 if (pathWithoutLocale === '') pathWithoutLocale = '/';
 
 const navLabels = {
-  pl: { home: 'Strona główna', catalog: 'Katalog', about: 'O nas', contact: 'Kontakt' },
-  ru: { home: 'Главная', catalog: 'Каталог', about: 'О нас', contact: 'Контакты' },
-  en: { home: 'Home', catalog: 'Catalog', about: 'About', contact: 'Contact' },
+  pl: { home: 'Strona główna', catalog: 'Katalog', delivery: 'Dostawa i płatność', about: 'O nas', contact: 'Kontakt' },
+  ru: { home: 'Главная', catalog: 'Каталог', delivery: 'Доставка и оплата', about: 'О нас', contact: 'Контакты' },
+  en: { home: 'Home', catalog: 'Catalog', delivery: 'Delivery & Payment', about: 'About', contact: 'Contact' },
 };
 const nav = navLabels[currentLocale] ?? navLabels.pl;
 
@@ -197,7 +197,9 @@ const businessSchema = {
       document.querySelectorAll('.lightbox-trigger').forEach((img) => {
         img.addEventListener('click', () => {
           const images = img.getAttribute('data-images').split(',');
-          openLightbox(images, 0);
+          const clickedSrc = img.getAttribute('src');
+          const startIndex = images.indexOf(clickedSrc);
+          openLightbox(images, startIndex >= 0 ? startIndex : 0);
         });
       });
 
@@ -238,6 +240,7 @@ const businessSchema = {
         <nav class="main-nav">
           <a href={getRelativeLocaleUrl(currentLocale, '/')}>{nav.home}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/catalog')}>{nav.catalog}</a>
+          <a href={getRelativeLocaleUrl(currentLocale, '/delivery')}>{nav.delivery}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/about')}>{nav.about}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/contact')}>{nav.contact}</a>
         </nav>

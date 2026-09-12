@@ -9,6 +9,11 @@ description:
   en: "Soft shades of lilac, blue and pink — stock flower and delphinium in elegant wrapping."
 price: 340
 priceRange: "200-400"
+size: "M"
+composition:
+  - "matthiola"
+  - "delphinium"
+  - "eustoma"
 cover: "bouquet-02.jpg"
 gallery:
   - "bouquet-02-1.jpg"

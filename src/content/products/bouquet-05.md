@@ -9,6 +9,9 @@ description:
   en: "A generous, statement bouquet of roses in powder pink and cream tones."
 price: 1350
 priceRange: "1000+"
+size: "XL"
+composition:
+  - "rose"
 cover: "bouquet-05.jpg"
 gallery:
   - "bouquet-05-1.jpg"

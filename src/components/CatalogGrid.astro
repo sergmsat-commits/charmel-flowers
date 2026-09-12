@@ -1,16 +1,31 @@
 ---
 import { getCollection } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import { FLOWER_SPECIES } from '../data/flowerSpecies';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 const products = await getCollection('products');
 
 const ranges = ['100-200', '200-400', '400-600', '600-800', '1000+'];
+const sizes = ['S', 'M', 'L', 'XL'];
+const initialVisibleSpeciesCount = 5;
 
 const labels = {
-  pl: { all: 'Wszystkie', wedding: 'Ślub', promo: 'Akcja', handmade: 'Rękodzieło', featured: 'Polecane', currency: 'zł', addToCart: 'Do koszyka' },
-  ru: { all: 'Все', wedding: 'Свадьба', promo: 'Акция', handmade: 'Ручная работа', featured: 'Рекомендуем', currency: 'zł', addToCart: 'В корзину' },
-  en: { all: 'All', wedding: 'Wedding', promo: 'Promo', handmade: 'Handmade', featured: 'Featured', currency: 'zł', addToCart: 'Add to cart' },
+  pl: {
+    all: 'Wszystkie', wedding: 'Ślub', promo: 'Akcja', handmade: 'Rękodzieło', featured: 'Polecane', currency: 'zł', addToCart: 'Do koszyka',
+    compositionTitle: 'Skład bukietu:', sizeTitle: 'Rozmiar:', reset: 'wyczyść',
+    showMore: (n) => `pokaż jeszcze ${n}`, showLess: 'ukryj',
+  },
+  ru: {
+    all: 'Все', wedding: 'Свадьба', promo: 'Акция', handmade: 'Ручная работа', featured: 'Рекомендуем', currency: 'zł', addToCart: 'В корзину',
+    compositionTitle: 'Состав букета:', sizeTitle: 'Размер:', reset: 'сбросить',
+    showMore: (n) => `показать ещё ${n}`, showLess: 'скрыть',
+  },
+  en: {
+    all: 'All', wedding: 'Wedding', promo: 'Promo', handmade: 'Handmade', featured: 'Featured', currency: 'zł', addToCart: 'Add to cart',
+    compositionTitle: 'Composition:', sizeTitle: 'Size:', reset: 'clear',
+    showMore: (n) => `show ${n} more`, showLess: 'hide',
+  },
 };
 const t = labels[currentLocale] ?? labels.pl;
 ---
@@ -30,67 +45,289 @@ const t = labels[currentLocale] ?? labels.pl;
     <button class="filter-btn" data-filter-group="category" data-value="handmade">{t.handmade}</button>
   </div>
 
-  <div class="catalog-grid">
-    {products.map((product, index) => (
-        <div
-          class="product-card reveal"
-          style={`transition-delay: ${Math.min(index * 60, 300)}ms`}
-          data-price-range={product.data.priceRange}
-          data-wedding={product.data.wedding ? 'true' : 'false'}
-          data-promo={product.data.promo ? 'true' : 'false'}
-          data-handmade={product.data.handmade ? 'true' : 'false'}
-        >
-          {product.data.featured && <span class="product-badge">{t.featured}</span>}
-          <button
-            class="favorite-btn"
-            data-favorite-id={product.id}
-            data-favorite-title={product.data.title[currentLocale]}
-            data-favorite-price={product.data.price}
-            data-favorite-cover={product.data.cover}
-            aria-label="Favorite"
-          >♥</button>
-          <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-image-link">
-            <img
-              src={`/images/products/${product.data.cover}`}
-              alt={product.data.title[currentLocale]}
-              class="product-img"
-            />
-          </a>
-          <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-title-link">
-            <h3 class="product-title">{product.data.title[currentLocale]}</h3>
-          </a>
-          <p class="product-description">{product.data.description[currentLocale]}</p>
-          <p class="product-price">{product.data.price} {t.currency}</p>
-          <button
-            class="add-to-cart-btn"
-            data-id={product.id}
-            data-title={product.data.title[currentLocale]}
-            data-price={product.data.price}
-            data-cover={product.data.cover}
-          >
-            {t.addToCart}
-          </button>
+  <div class="catalog-layout">
+    <aside class="catalog-sidebar">
+      <div class="sidebar-filter-group">
+        <div class="sidebar-filter-header">
+          <span>{t.compositionTitle}</span>
+          <button type="button" class="sidebar-reset-btn" data-reset="composition">{t.reset}</button>
         </div>
-    ))}
+        <div class="composition-list">
+          {FLOWER_SPECIES.map((species, i) => (
+            <label class={`composition-item${i >= initialVisibleSpeciesCount ? ' composition-item-extra' : ''}`} style={i >= initialVisibleSpeciesCount ? 'display:none;' : undefined}>
+              <input type="checkbox" class="composition-checkbox" data-species={species.slug} />
+              <span class="composition-label">{species[currentLocale] ?? species.ru}</span>
+            </label>
+          ))}
+        </div>
+        {FLOWER_SPECIES.length > initialVisibleSpeciesCount && (
+          <button
+            type="button"
+            class="composition-toggle-btn"
+            id="composition-toggle-btn"
+            data-show-more={t.showMore(FLOWER_SPECIES.length - initialVisibleSpeciesCount)}
+            data-show-less={t.showLess}
+          >
+            {t.showMore(FLOWER_SPECIES.length - initialVisibleSpeciesCount)}
+          </button>
+        )}
+      </div>
+
+      <div class="sidebar-filter-group">
+        <div class="sidebar-filter-header">
+          <span>{t.sizeTitle}</span>
+          <button type="button" class="sidebar-reset-btn" data-reset="size">{t.reset}</button>
+        </div>
+        <div class="size-list">
+          {sizes.map((s) => (
+            <label class="size-item">
+              <input type="checkbox" class="size-checkbox" data-size={s} />
+              <span class="size-label">{s}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </aside>
+
+    <div class="catalog-grid">
+      {products.map((product, index) => (
+          <div
+            class="product-card reveal"
+            style={`transition-delay: ${Math.min(index * 60, 300)}ms`}
+            data-price-range={product.data.priceRange}
+            data-wedding={product.data.wedding ? 'true' : 'false'}
+            data-promo={product.data.promo ? 'true' : 'false'}
+            data-handmade={product.data.handmade ? 'true' : 'false'}
+            data-size={product.data.size ?? ''}
+            data-composition={(product.data.composition ?? []).join(',')}
+          >
+            {product.data.featured && <span class="product-badge">{t.featured}</span>}
+            <button
+              class="favorite-btn"
+              data-favorite-id={product.id}
+              data-favorite-title={product.data.title[currentLocale]}
+              data-favorite-price={product.data.price}
+              data-favorite-cover={product.data.cover}
+              aria-label="Favorite"
+            >♥</button>
+            <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-image-link">
+              <img
+                src={`/images/products/${product.data.cover}`}
+                alt={product.data.title[currentLocale]}
+                class="product-img"
+              />
+            </a>
+            <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-title-link">
+              <h3 class="product-title">{product.data.title[currentLocale]}</h3>
+            </a>
+            <p class="product-description">{product.data.description[currentLocale]}</p>
+            <p class="product-price">{product.data.price} {t.currency}</p>
+            <button
+              class="add-to-cart-btn"
+              data-id={product.id}
+              data-title={product.data.title[currentLocale]}
+              data-price={product.data.price}
+              data-cover={product.data.cover}
+            >
+              {t.addToCart}
+            </button>
+          </div>
+      ))}
+    </div>
   </div>
 </div>
+
+<style>
+  .catalog-layout {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+  }
+
+  .catalog-sidebar {
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .catalog-layout .catalog-grid {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sidebar-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .sidebar-filter-header span {
+    font-family: var(--font-heading);
+    font-weight: bold;
+    color: var(--color-text);
+    font-size: 0.95rem;
+  }
+
+  .sidebar-reset-btn {
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .composition-list,
+  .size-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .composition-item,
+  .size-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .composition-item.is-unavailable,
+  .size-item.is-unavailable {
+    color: #aaa;
+    text-decoration: line-through;
+    cursor: default;
+  }
+
+  .composition-toggle-btn {
+    margin-top: 10px;
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    font-size: 0.85rem;
+    text-decoration: underline dotted;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  @media (max-width: 480px) {
+    .catalog-layout {
+      flex-direction: column;
+    }
+
+    .catalog-sidebar {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+</style>
 
 <script>
   const priceButtons = document.querySelectorAll('.filter-btn[data-filter-group="price"]');
   const categoryButtons = document.querySelectorAll('.filter-btn[data-filter-group="category"]');
+  const sizeCheckboxes = document.querySelectorAll('.size-checkbox');
+  const compositionCheckboxes = document.querySelectorAll('.composition-checkbox');
   const cards = document.querySelectorAll('.product-card');
 
   let selectedPrice = 'all';
   let selectedCategory = 'all';
 
-  function applyFilters() {
+  function getSelectedSizes() {
+    return Array.from(sizeCheckboxes)
+      .filter((cb) => cb.checked)
+      .map((cb) => cb.getAttribute('data-size'));
+  }
+
+  function getSelectedComposition() {
+    return Array.from(compositionCheckboxes)
+      .filter((cb) => cb.checked)
+      .map((cb) => cb.getAttribute('data-species'));
+  }
+
+  function cardMatchesSize(card, sizes) {
+    if (sizes.length === 0) return true;
+    return sizes.includes(card.getAttribute('data-size'));
+  }
+
+  function cardMatchesComposition(card, species) {
+    if (species.length === 0) return true;
+    const cardSpecies = (card.getAttribute('data-composition') || '').split(',').filter(Boolean);
+    return species.some((s) => cardSpecies.includes(s));
+  }
+
+  function filterCards() {
+    const selectedSizes = getSelectedSizes();
+    const selectedComposition = getSelectedComposition();
+
     cards.forEach((card) => {
       const priceMatch = selectedPrice === 'all' || card.getAttribute('data-price-range') === selectedPrice;
       const categoryMatch =
         selectedCategory === 'all' ||
         card.getAttribute(`data-${selectedCategory}`) === 'true';
-      card.style.display = priceMatch && categoryMatch ? '' : 'none';
+      const sizeMatch = cardMatchesSize(card, selectedSizes);
+      const compositionMatch = cardMatchesComposition(card, selectedComposition);
+      card.style.display = priceMatch && categoryMatch && sizeMatch && compositionMatch ? '' : 'none';
     });
+  }
+
+  // Возвращает true, если пришлось принудительно снять галочку с недоступного варианта
+  function updateFacetAvailability() {
+    const selectedSizes = getSelectedSizes();
+    const selectedComposition = getSelectedComposition();
+    let forcedUncheck = false;
+
+    // доступные размеры = размеры товаров, проходящих фильтр состава (без учёта самого размера)
+    const availableSizes = new Set();
+    cards.forEach((card) => {
+      if (cardMatchesComposition(card, selectedComposition)) {
+        const s = card.getAttribute('data-size');
+        if (s) availableSizes.add(s);
+      }
+    });
+    sizeCheckboxes.forEach((cb) => {
+      const label = cb.closest('.size-item');
+      const isAvailable = availableSizes.has(cb.getAttribute('data-size'));
+      if (label) label.classList.toggle('is-unavailable', !isAvailable);
+      if (!isAvailable && cb.checked) {
+        cb.checked = false;
+        forcedUncheck = true;
+      }
+    });
+
+    // доступные виды = виды товаров, проходящих фильтр размера (без учёта самого состава)
+    const availableSpecies = new Set();
+    cards.forEach((card) => {
+      if (cardMatchesSize(card, selectedSizes)) {
+        const cardSpecies = (card.getAttribute('data-composition') || '').split(',').filter(Boolean);
+        cardSpecies.forEach((s) => availableSpecies.add(s));
+      }
+    });
+    compositionCheckboxes.forEach((cb) => {
+      const label = cb.closest('.composition-item');
+      const isAvailable = availableSpecies.has(cb.getAttribute('data-species'));
+      if (label) label.classList.toggle('is-unavailable', !isAvailable);
+      if (!isAvailable && cb.checked) {
+        cb.checked = false;
+        forcedUncheck = true;
+      }
+    });
+
+    return forcedUncheck;
+  }
+
+  function applyAllFilters() {
+    filterCards();
+    const hadForcedUncheck = updateFacetAvailability();
+    if (hadForcedUncheck) {
+      filterCards();
+      updateFacetAvailability();
+    }
   }
 
   priceButtons.forEach((btn) => {
@@ -98,7 +335,7 @@ const t = labels[currentLocale] ?? labels.pl;
       priceButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       selectedPrice = btn.getAttribute('data-value');
-      applyFilters();
+      applyAllFilters();
     });
   });
 
@@ -107,9 +344,40 @@ const t = labels[currentLocale] ?? labels.pl;
       categoryButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       selectedCategory = btn.getAttribute('data-value');
-      applyFilters();
+      applyAllFilters();
     });
   });
+
+  sizeCheckboxes.forEach((cb) => cb.addEventListener('change', applyAllFilters));
+  compositionCheckboxes.forEach((cb) => cb.addEventListener('change', applyAllFilters));
+
+  document.querySelectorAll('.sidebar-reset-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const group = btn.getAttribute('data-reset');
+      const targets = group === 'size' ? sizeCheckboxes : compositionCheckboxes;
+      targets.forEach((cb) => {
+        cb.checked = false;
+      });
+      applyAllFilters();
+    });
+  });
+
+  const compositionToggleBtn = document.getElementById('composition-toggle-btn');
+  if (compositionToggleBtn) {
+    compositionToggleBtn.addEventListener('click', () => {
+      const extraItems = document.querySelectorAll('.composition-item-extra');
+      const isHidden = extraItems.length > 0 && extraItems[0].style.display === 'none';
+      extraItems.forEach((item) => {
+        item.style.display = isHidden ? '' : 'none';
+      });
+      compositionToggleBtn.textContent = isHidden
+        ? compositionToggleBtn.getAttribute('data-show-less')
+        : compositionToggleBtn.getAttribute('data-show-more');
+    });
+  }
+
+  // первичный расчёт доступности фасетов при загрузке страницы
+  updateFacetAvailability();
 
   document.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
     const originalText = btn.textContent;

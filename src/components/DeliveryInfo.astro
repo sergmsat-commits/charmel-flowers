@@ -1,0 +1,221 @@
+---
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'Dostawa i płatność',
+    tabs: [
+      {
+        label: 'Warunki dostawy',
+        paragraphs: [
+          'Dostawę realizujemy w godzinach pracy naszego studia: pon–pt 10:00–20:00, sob 10:00–18:00, nie 10:00–17:00. Bukiet przygotowujemy zwykle w około 15 minut od złożenia zamówienia, a samą dostawę wykonuje kurier Uber lub Wolt — dokładny czas dojazdu zależy od adresu odbiorcy w Warszawie oraz aktualnej dostępności kurierów.',
+          'Dostawa w dniu zamówienia jest możliwa, jeśli zamówienie zostanie potwierdzone odpowiednio wcześniej. Preferowaną godzinę możesz wskazać w formularzu zamówienia — postaramy się ją uwzględnić, a dokładny czas potwierdzimy po złożeniu zamówienia.',
+          "Jeśli nie znasz dokładnego adresu odbiorcy, podaj w komentarzu jego numer telefonu — skontaktujemy się, aby ustalić szczegóły dostawy.",
+          'Odbiór osobisty jest możliwy w naszym studiu na Kabatach: Stryjeńskich 6/lok.UH1B, w godzinach pracy studia.',
+        ],
+      },
+      {
+        label: 'Koszt dostawy',
+        paragraphs: [
+          'Koszt dostawy zależy od adresu odbiorcy i aktualnej taryfy Uber/Wolt w momencie realizacji zamówienia — dokładną kwotę potwierdzimy przy finalizacji zamówienia.',
+          'Odbiór osobisty w naszym studiu na Kabatach jest bezpłatny.',
+        ],
+      },
+      {
+        label: 'Ważne informacje',
+        paragraphs: [
+          "Jeśli odbiorcy nie ma pod wskazanym adresem, odmówi przyjęcia zamówienia lub nie wyjdzie do kuriera w ustalonym czasie — dostawa uznawana jest za nieudaną, a zamówienie wraca do naszego studia. Możesz odebrać je samodzielnie w ciągu 24 godzin od nieudanej próby dostawy.",
+          'Ponowna dostawa jest możliwa za dodatkową opłatą (koszt kolejnego kursu kuriera). Jeśli zamówienie nie zostanie odebrane w ciągu 24 godzin i nie ustalimy ponownej dostawy, nie jesteśmy w stanie zwrócić kosztów zamówienia — bukiet i pierwsza próba dostawy zostały już zrealizowane.',
+          'Za zgodą odbiorcy kurier może zostawić zamówienie w innym bezpiecznym miejscu — na recepcji, u sąsiadów, pod drzwiami. W takim przypadku nie ponosimy odpowiedzialności za stan bukietu po jego pozostawieniu.',
+        ],
+      },
+      {
+        label: 'Formy płatności',
+        paragraphs: [
+          'Przy składaniu zamówienia przez stronę dostępne są szybkie formy płatności: BLIK lub gotówka przy odbiorze/dostawie.',
+          'Przyjmujemy również płatność kartą (Visa, Mastercard), przelewem przez Przelewy24, a także PayPal i PayU (z obsługą Apple Pay i Google Pay) — w takim przypadku skontaktuj się z nami telefonicznie lub przez WhatsApp po złożeniu zamówienia, a pomożemy dokończyć płatność wygodnym dla Ciebie sposobem.',
+          'Jeśli pojawią się jakiekolwiek trudności z płatnością — po prostu zadzwoń lub napisz, chętnie pomożemy.',
+        ],
+      },
+    ],
+  },
+  ru: {
+    title: 'Доставка и оплата',
+    tabs: [
+      {
+        label: 'Условия доставки',
+        paragraphs: [
+          'Доставку осуществляем в часы работы нашей студии: Пн–Пт 10:00–20:00, Сб 10:00–18:00, Вс 10:00–17:00. Букет обычно готовим примерно за 15 минут с момента заказа, а саму доставку выполняет курьер Uber или Wolt — точное время в пути зависит от адреса получателя в Варшаве и текущей доступности курьеров.',
+          'Доставка в день заказа возможна, если заказ подтверждён заблаговременно. Желаемое время можно указать в форме заказа — постараемся его учесть, а точный тайминг подтвердим после оформления.',
+          'Если вы не знаете точный адрес получателя, укажите в комментарии его номер телефона — мы свяжемся, чтобы уточнить детали доставки.',
+          'Самовывоз возможен в нашей студии на Kabatach: Stryjeńskich 6/lok.UH1B, в часы работы студии.',
+        ],
+      },
+      {
+        label: 'Стоимость доставки',
+        paragraphs: [
+          'Стоимость доставки зависит от адреса получателя и актуального тарифа Uber/Wolt на момент оформления заказа — точную сумму подтвердим при финализации заказа.',
+          'Самовывоз из нашей студии на Kabatach — бесплатно.',
+        ],
+      },
+      {
+        label: 'Важно знать',
+        paragraphs: [
+          'Если получателя нет по указанному адресу, он отказался принять заказ или не вышел к курьеру в оговорённое время — доставка считается несостоявшейся, и заказ возвращается в нашу студию. Забрать его самостоятельно можно в течение 24 часов после неудачной попытки доставки.',
+          'Повторная доставка возможна за дополнительную плату (стоимость ещё одной поездки курьера). Если заказ не будет забран в течение 24 часов и повторная доставка не согласована, вернуть стоимость заказа мы не сможем — букет и первая попытка доставки уже были выполнены.',
+          'С согласия получателя курьер может оставить заказ в другом безопасном месте — на ресепшене, у соседей, у двери. В этом случае мы не несём ответственности за сохранность букета после этого момента.',
+        ],
+      },
+      {
+        label: 'Способы оплаты',
+        paragraphs: [
+          'При оформлении заказа через сайт доступны быстрые способы оплаты: BLIK или наличными при получении/доставке.',
+          'Также принимаем оплату банковской картой (Visa, Mastercard), через Przelewy24, а также PayPal и PayU (с поддержкой Apple Pay и Google Pay) — для этого свяжитесь с нами по телефону или в WhatsApp после оформления заказа, и мы поможем провести оплату удобным способом.',
+          'Если возникнут любые сложности с оплатой — просто напишите или позвоните нам, мы всегда на связи.',
+        ],
+      },
+    ],
+  },
+  en: {
+    title: 'Delivery & Payment',
+    tabs: [
+      {
+        label: 'Delivery conditions',
+        paragraphs: [
+          "We deliver during our studio's opening hours: Mon–Fri 10:00–20:00, Sat 10:00–18:00, Sun 10:00–17:00. Your bouquet is usually ready in about 15 minutes from ordering, and delivery itself is handled by an Uber or Wolt courier — the exact travel time depends on the recipient's address in Warsaw and courier availability at that moment.",
+          "Same-day delivery is possible if the order is confirmed early enough. You can indicate a preferred time in the order form — we'll try to accommodate it, and confirm the exact timing after the order is placed.",
+          "If you don't know the recipient's exact address, leave their phone number in the comment field — we'll contact them to confirm the delivery details.",
+          'Self-pickup is available at our studio in Kabaty: Stryjeńskich 6/lok.UH1B, during studio opening hours.',
+        ],
+      },
+      {
+        label: 'Delivery cost',
+        paragraphs: [
+          "Delivery cost depends on the recipient's address and the current Uber/Wolt rate at the time of your order — we'll confirm the exact amount when finalizing the order.",
+          'Self-pickup at our studio in Kabaty is free.',
+        ],
+      },
+      {
+        label: 'Important information',
+        paragraphs: [
+          "If the recipient isn't at the given address, refuses the order, or doesn't come out to meet the courier at the agreed time, the delivery is considered unsuccessful and the order returns to our studio. You can pick it up yourself within 24 hours of the failed delivery attempt.",
+          "A repeat delivery is possible for an additional fee (the cost of another courier trip). If the order isn't collected within 24 hours and a repeat delivery hasn't been arranged, we won't be able to refund the order — the bouquet and the first delivery attempt have already been completed.",
+          "With the recipient's consent, the courier may leave the order in another safe place — at reception, with neighbours, or by the door. In that case we are not responsible for the bouquet's condition after it has been left.",
+        ],
+      },
+      {
+        label: 'Payment methods',
+        paragraphs: [
+          'When ordering through the website, quick payment options are available: BLIK or cash on pickup/delivery.',
+          "We also accept payment by card (Visa, Mastercard), via Przelewy24, as well as PayPal and PayU (supporting Apple Pay and Google Pay) — for these, please contact us by phone or WhatsApp after placing your order, and we'll help you complete the payment in a convenient way.",
+          "If you run into any payment difficulties, just message or call us — we're always happy to help.",
+        ],
+      },
+    ],
+  },
+};
+
+const t = content[currentLocale] ?? content.pl;
+---
+
+<section class="delivery-page reveal">
+  <h1>{t.title}</h1>
+
+  <div class="delivery-tabs" role="tablist">
+    {t.tabs.map((tab, i) => (
+      <button
+        class={`delivery-tab ${i === 0 ? 'active' : ''}`}
+        data-tab={i}
+        role="tab"
+        aria-selected={i === 0 ? 'true' : 'false'}
+        type="button"
+      >
+        {tab.label}
+      </button>
+    ))}
+  </div>
+
+  <div class="delivery-panels">
+    {t.tabs.map((tab, i) => (
+      <div class="delivery-panel" data-panel={i} style={i === 0 ? undefined : 'display:none;'}>
+        {tab.paragraphs.map((p) => <p>{p}</p>)}
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.delivery-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = btn.getAttribute('data-tab');
+
+      document.querySelectorAll('.delivery-tab').forEach((b) => {
+        b.classList.toggle('active', b === btn);
+        b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+      });
+
+      document.querySelectorAll('.delivery-panel').forEach((panel) => {
+        panel.style.display = panel.getAttribute('data-panel') === idx ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .delivery-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+
+  .delivery-page h1 {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: 2rem;
+    margin-bottom: 32px;
+  }
+
+  .delivery-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 2px solid var(--color-primary-dark);
+    margin-bottom: 24px;
+  }
+
+  .delivery-tab {
+    font-family: var(--font-body);
+    background: var(--color-primary);
+    color: var(--color-text);
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    border-radius: 6px 6px 0 0;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .delivery-tab.active {
+    background: var(--color-accent);
+    color: var(--color-white);
+  }
+
+  .delivery-panel p {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 480px) {
+    .delivery-tabs {
+      flex-direction: column;
+      border-bottom: none;
+    }
+
+    .delivery-tab {
+      border-radius: 6px;
+      text-align: left;
+    }
+  }
+</style>

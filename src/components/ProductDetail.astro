@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import { FLOWER_SPECIES } from '../data/flowerSpecies';
 
 const { product } = Astro.props;
 const currentLocale = Astro.currentLocale ?? 'pl';
@@ -12,6 +13,8 @@ const labels = {
     showLess: 'Pokaż mniej',
     backToCatalog: '← Powrót do katalogu',
     currency: 'zł',
+    sizeLabel: 'Rozmiar',
+    compositionLabel: 'Skład bukietu',
   },
   ru: {
     addToCart: 'Добавить в корзину',
@@ -20,6 +23,8 @@ const labels = {
     showLess: 'Скрыть',
     backToCatalog: '← Назад в каталог',
     currency: 'zł',
+    sizeLabel: 'Размер',
+    compositionLabel: 'Состав букета',
   },
   en: {
     addToCart: 'Add to cart',
@@ -28,9 +33,18 @@ const labels = {
     showLess: 'Show less',
     backToCatalog: '← Back to catalog',
     currency: 'zł',
+    sizeLabel: 'Size',
+    compositionLabel: 'Composition',
   },
 };
 const t = labels[currentLocale] ?? labels.pl;
+
+const speciesLookup = Object.fromEntries(FLOWER_SPECIES.map((s) => [s.slug, s]));
+function speciesLabel(slug) {
+  const entry = speciesLookup[slug];
+  if (!entry) return slug;
+  return entry[currentLocale] ?? entry.ru;
+}
 
 const addons = [
   { id: 'addon-aquabox', cover: 'aquabox.jpg', price: 15, title: { pl: 'Aquabox', ru: 'Аквабокс', en: 'Aqua box' } },
@@ -48,7 +62,8 @@ const addons = [
 const visibleAddons = addons.slice(0, 4);
 const hiddenAddons = addons.slice(4);
 
-const allImages = [product.data.cover, ...product.data.gallery]
+const galleryPhotos = (product.data.gallery ?? []).slice(0, 3);
+const allImages = [product.data.cover, ...(product.data.gallery ?? [])]
   .map((f) => `/images/products/${f}`)
   .join(',');
 
@@ -80,15 +95,40 @@ const productSchema = {
       <img
         src={`/images/products/${product.data.cover}`}
         alt={product.data.title[currentLocale]}
-        class="lightbox-trigger"
+        class="lightbox-trigger product-detail-main-img"
         data-images={allImages}
       />
+      {galleryPhotos.length > 0 && (
+        <div class="product-detail-thumbs">
+          {galleryPhotos.map((img) => (
+            <img
+              src={`/images/products/${img}`}
+              alt={product.data.title[currentLocale]}
+              class="lightbox-trigger product-detail-thumb"
+              data-images={allImages}
+            />
+          ))}
+        </div>
+      )}
     </div>
 
     <div class="product-detail-info">
       <h1>{product.data.title[currentLocale]}</h1>
       <p class="product-detail-description">{product.data.description[currentLocale]}</p>
       <p class="product-detail-price">{product.data.price} {t.currency}</p>
+
+      {product.data.size && (
+        <p class="product-detail-meta">
+          <span class="product-detail-meta-label">{t.sizeLabel}:</span> <strong>{product.data.size}</strong>
+        </p>
+      )}
+
+      {product.data.composition && product.data.composition.length > 0 && (
+        <p class="product-detail-meta">
+          <span class="product-detail-meta-label">{t.compositionLabel}:</span>{' '}
+          {product.data.composition.map((slug) => speciesLabel(slug)).join(', ')}
+        </p>
+      )}
 
       <div class="addon-section">
         <h2>{t.addons}</h2>
@@ -153,6 +193,39 @@ const productSchema = {
     </div>
   </div>
 </section>
+
+<style>
+  .product-detail-thumbs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .product-detail-thumb {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid var(--color-primary-dark);
+    transition: opacity 0.2s ease;
+  }
+
+  .product-detail-thumb:hover {
+    opacity: 0.8;
+  }
+
+  .product-detail-meta {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    margin: 4px 0;
+  }
+
+  .product-detail-meta-label {
+    color: var(--color-accent);
+  }
+</style>
 
 <script>
   const toggleBtn = document.getElementById('addon-toggle-btn');

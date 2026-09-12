@@ -9,6 +9,11 @@ description:
   en: "Deep red roses paired with dusty pink carnations and eucalyptus."
 price: 480
 priceRange: "400-600"
+size: "L"
+composition:
+  - "rose"
+  - "dianthus"
+  - "eucalyptus"
 cover: "bouquet-03.jpg"
 gallery:
   - "bouquet-03-1.jpg"

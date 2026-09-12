@@ -1,4 +1,6 @@
 ---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
 const currentLocale = Astro.currentLocale ?? 'pl';
 
 const botToken = import.meta.env.PUBLIC_TELEGRAM_BOT_TOKEN ?? '';
@@ -18,6 +20,7 @@ const content = {
     fulfillmentLabel: 'Sposób odbioru',
     deliveryOption: 'Dostawa',
     pickupOption: 'Odbiór osobisty (Kabaty)',
+    deliveryNote: 'Zobacz sekcję DOSTAWA I PŁATNOŚĆ',
     address: 'Adres dostawy',
     pickupNote: 'Odbiór pod adresem: Stryjeńskich 6/lok.UH1B, Kabaty',
     date: 'Data', time: 'Godzina',
@@ -43,6 +46,7 @@ const content = {
     fulfillmentLabel: 'Способ получения',
     deliveryOption: 'Доставка',
     pickupOption: 'Самовывоз (Кабаты)',
+    deliveryNote: 'Смотри раздел ДОСТАВКА И ОПЛАТА',
     address: 'Адрес доставки',
     pickupNote: 'Самовывоз по адресу: Stryjeńskich 6/lok.UH1B, Кабаты',
     date: 'Дата', time: 'Время',
@@ -68,6 +72,7 @@ const content = {
     fulfillmentLabel: 'Fulfillment method',
     deliveryOption: 'Delivery',
     pickupOption: 'Pickup (Kabaty)',
+    deliveryNote: 'See the DELIVERY & PAYMENT section',
     address: 'Delivery address',
     pickupNote: 'Pickup at: Stryjeńskich 6/lok.UH1B, Kabaty',
     date: 'Date', time: 'Time',
@@ -82,6 +87,7 @@ const content = {
   },
 };
 const t = content[currentLocale] ?? content.pl;
+const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
 ---
 
 <section class="cart-section">
@@ -140,6 +146,10 @@ const t = content[currentLocale] ?? content.pl;
       </div>
     </div>
 
+    <p class="delivery-info-note">
+      * <a href={deliveryPageUrl} target="_blank" rel="noopener">{t.deliveryNote}</a>
+    </p>
+
     <label id="recipient-address-field">
       {t.address}
       <input type="text" name="recipientAddress" id="recipient-address-input" required />
@@ -187,6 +197,17 @@ const t = content[currentLocale] ?? content.pl;
     <p id="order-status-msg" class="order-status-msg"></p>
   </form>
 </section>
+
+<style>
+  .delivery-info-note {
+    margin: 8px 0 16px;
+  }
+
+  .delivery-info-note a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>
 
 <script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error, paymentBlikLabel: t.paymentBlik, paymentCashLabel: t.paymentCash, pickupNoteText: t.pickupNote, botToken, chatId }}>
   const BOT_TOKEN = botToken;

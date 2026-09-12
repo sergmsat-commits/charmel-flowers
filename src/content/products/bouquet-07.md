@@ -9,6 +9,9 @@ description:
   en: "White roses adorned with pearl strands, paired with a matching boutonniere for the groom."
 price: 650
 priceRange: "600-800"
+size: "XL"
+composition:
+  - "rose"
 cover: "bouquet-07.jpg"
 gallery:
   - "bouquet-07-1.jpg"

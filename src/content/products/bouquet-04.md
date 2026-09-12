@@ -9,6 +9,10 @@ description:
   en: "Vivid pink roses with delicate accents — a bouquet that makes an impression."
 price: 720
 priceRange: "600-800"
+size: "XL"
+composition:
+  - "rose"
+  - "gypsophila"
 cover: "bouquet-04.jpg"
 gallery:
   - "bouquet-04-1.jpg"

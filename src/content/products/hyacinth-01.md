@@ -9,6 +9,9 @@ description:
   en: "A live hyacinth presented in an elegant branded box — a ready-made gift with no extra effort."
 price: 140
 priceRange: "100-200"
+size: "S"
+composition:
+  - "hyacinth"
 cover: "hyacinth-01.jpg"
 gallery:
   - "hyacinth-01-1.jpg"

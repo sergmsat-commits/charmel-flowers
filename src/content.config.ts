@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { FLOWER_SPECIES_SLUGS } from './data/flowerSpecies';
 
 const products = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/products' }),
@@ -22,6 +23,8 @@ const products = defineCollection({
     cover: z.string(),
     gallery: z.array(z.string()).optional().default([]),
     featured: z.boolean().optional().default(false),
+    size: z.enum(['S', 'M', 'L', 'XL']).optional(),
+    composition: z.array(z.enum(FLOWER_SPECIES_SLUGS)).optional().default([]),
   }),
 });
 
