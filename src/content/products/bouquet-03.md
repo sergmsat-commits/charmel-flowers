@@ -7,9 +7,9 @@ description:
   pl: "Intensywnie czerwone róże w towarzystwie pudrowych goździków i eukaliptusa."
   ru: "Насыщенно-красные розы в сочетании с пудровыми гвоздиками и эвкалиптом."
   en: "Deep red roses paired with dusty pink carnations and eucalyptus."
-price: 480
-priceRange: "400-600"
-size: "L"
+variants:
+  - size: "L"
+    price: 480
 composition:
   - "rose"
   - "dianthus"

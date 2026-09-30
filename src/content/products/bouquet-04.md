@@ -7,9 +7,9 @@ description:
   pl: "Intensywnie różowe róże z delikatnymi dodatkami — bukiet, który robi wrażenie."
   ru: "Насыщенно-розовые розы с нежными акцентами — букет, который производит впечатление."
   en: "Vivid pink roses with delicate accents — a bouquet that makes an impression."
-price: 720
-priceRange: "600-800"
-size: "XL"
+variants:
+  - size: "XL"
+    price: 720
 composition:
   - "rose"
   - "gypsophila"

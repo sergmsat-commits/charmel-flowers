@@ -1,21 +1,24 @@
 ---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
 const currentLocale = Astro.currentLocale ?? 'pl';
+const deliveryUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
 
 const slides = {
   pl: [
-    '⚡ Gotowe w 15 minut',
-    '🚗 Dostawa Uber/Wolt po całej Warszawie',
-    '⭐ 5.0 na Google — 100+ zadowolonych klientów',
+    { text: '⚡ Gotowe w 15 minut', note: '* zobacz sekcję Dostawa i płatność' },
+    { text: '🚗 Dostawa Uber/Wolt po całej Warszawie' },
+    { text: '⭐ 5.0 na Google — 100+ zadowolonych klientów' },
   ],
   ru: [
-    '⚡ Готово за 15 минут',
-    '🚗 Доставка Uber/Wolt по всей Варшаве',
-    '⭐ 5.0 на Google — 100+ довольных клиентов',
+    { text: '⚡ Готово за 15 минут', note: '* смотри раздел Доставка и оплата' },
+    { text: '🚗 Доставка Uber/Wolt по всей Варшаве' },
+    { text: '⭐ 5.0 на Google — 100+ довольных клиентов' },
   ],
   en: [
-    '⚡ Ready in 15 minutes',
-    '🚗 Uber/Wolt delivery across Warsaw',
-    '⭐ 5.0 on Google — 100+ happy customers',
+    { text: '⚡ Ready in 15 minutes', note: '* see the Delivery & Payment section' },
+    { text: '🚗 Uber/Wolt delivery across Warsaw' },
+    { text: '⭐ 5.0 on Google — 100+ happy customers' },
   ],
 };
 const t = slides[currentLocale] ?? slides.pl;
@@ -23,8 +26,13 @@ const t = slides[currentLocale] ?? slides.pl;
 
 <section class="promo-slider">
   <div class="promo-track" id="promo-track">
-    {t.map((text) => (
-      <div class="promo-slide">{text}</div>
+    {t.map((slide) => (
+      <div class="promo-slide">
+        <span>{slide.text}</span>
+        {slide.note && (
+          <a class="promo-slide-note" href={deliveryUrl} target="_blank" rel="noopener">{slide.note}</a>
+        )}
+      </div>
     ))}
   </div>
   <div class="promo-dots" id="promo-dots">
@@ -33,6 +41,24 @@ const t = slides[currentLocale] ?? slides.pl;
     ))}
   </div>
 </section>
+
+<style>
+  .promo-slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .promo-slide-note {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: inherit;
+    opacity: 0.75;
+    text-decoration: underline;
+  }
+</style>
 
 <script>
   const track = document.getElementById('promo-track');

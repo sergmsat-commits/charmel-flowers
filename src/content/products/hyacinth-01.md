@@ -7,9 +7,9 @@ description:
   pl: "Żywy hiacynt zapakowany w elegancki, autorski box — gotowy prezent bez dodatkowych starań."
   ru: "Живой гиацинт в элегантной фирменной коробке — готовый подарок без лишних хлопот."
   en: "A live hyacinth presented in an elegant branded box — a ready-made gift with no extra effort."
-price: 140
-priceRange: "100-200"
-size: "S"
+variants:
+  - size: "S"
+    price: 140
 composition:
   - "hyacinth"
 cover: "hyacinth-01.jpg"

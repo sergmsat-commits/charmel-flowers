@@ -7,9 +7,9 @@ description:
   pl: "Białe róże ozdobione perełkami, w komplecie z butonierką dla pana młodego."
   ru: "Белые розы, украшенные жемчужными нитями, в комплекте с бутоньеркой для жениха."
   en: "White roses adorned with pearl strands, paired with a matching boutonniere for the groom."
-price: 650
-priceRange: "600-800"
-size: "XL"
+variants:
+  - size: "XL"
+    price: 650
 composition:
   - "rose"
 cover: "bouquet-07.jpg"

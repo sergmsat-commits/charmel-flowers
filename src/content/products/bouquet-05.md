@@ -7,9 +7,9 @@ description:
   pl: "Obszerny, reprezentacyjny bukiet z róż w odcieniach pudrowego różu i kremu."
   ru: "Объёмный, эффектный букет из роз в пудрово-розовых и кремовых оттенках."
   en: "A generous, statement bouquet of roses in powder pink and cream tones."
-price: 1350
-priceRange: "1000+"
-size: "XL"
+variants:
+  - size: "XL"
+    price: 1350
 composition:
   - "rose"
 cover: "bouquet-05.jpg"

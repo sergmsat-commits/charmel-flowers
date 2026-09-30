@@ -15,15 +15,24 @@ const products = defineCollection({
       ru: z.string(),
       en: z.string(),
     }),
-    price: z.number(),
-    priceRange: z.enum(['100-200', '200-400', '400-600', '600-800', '1000+']),
+    // Каждый товар — список вариантов (размер + цена). У большинства сейчас
+    // всего один вариант (без size) — это ок, size опционален.
+    // Для товаров с несколькими размерами (как Bloom/Lacy Bird) перечисляем
+    // все варианты по возрастанию размера.
+    variants: z
+      .array(
+        z.object({
+          size: z.enum(['S', 'M', 'L', 'XL', 'XXL']).optional(),
+          price: z.number(),
+        })
+      )
+      .min(1),
     wedding: z.boolean().optional().default(false),
     promo: z.boolean().optional().default(false),
     handmade: z.boolean().optional().default(false),
     cover: z.string(),
     gallery: z.array(z.string()).optional().default([]),
     featured: z.boolean().optional().default(false),
-    size: z.enum(['S', 'M', 'L', 'XL']).optional(),
     composition: z.array(z.enum(FLOWER_SPECIES_SLUGS)).optional().default([]),
   }),
 });

@@ -43,7 +43,7 @@ const footer = {
   pl: {
     heading: 'Charmel Flowers | Kwiaciarnia Warszawa',
     tagline: 'Bukiety, które robią wrażenie 🌺',
-    delivery: '⚡ Bukiet gotowy w 15 minut • 🚗 Dostawa: Uber / Wolt',
+    delivery: '⚡ Bukiet gotowy w 15 minut* • 🚗 Dostawa: Uber / Wolt',
     hoursTitle: 'Godziny otwarcia',
     hours: [
       { days: 'Pon\u2013Pt', time: '10:00\u201320:00' },
@@ -55,7 +55,7 @@ const footer = {
   ru: {
     heading: 'Charmel Flowers | Цветочный магазин Варшава',
     tagline: 'Букеты, которые производят впечатление 🌺',
-    delivery: '⚡ Букет готов за 15 минут • 🚗 Доставка: Uber / Wolt',
+    delivery: '⚡ Букет готов за 15 минут* • 🚗 Доставка: Uber / Wolt',
     hoursTitle: 'Часы работы',
     hours: [
       { days: 'Пн\u2013Пт', time: '10:00\u201320:00' },
@@ -67,7 +67,7 @@ const footer = {
   en: {
     heading: 'Charmel Flowers | Warsaw Flower Shop',
     tagline: 'Bouquets that make an impression 🌺',
-    delivery: '⚡ Bouquet ready in 15 minutes • 🚗 Delivery: Uber / Wolt',
+    delivery: '⚡ Bouquet ready in 15 minutes* • 🚗 Delivery: Uber / Wolt',
     hoursTitle: 'Opening Hours',
     hours: [
       { days: 'Mon\u2013Fri', time: '10:00\u201320:00' },
@@ -197,9 +197,7 @@ const businessSchema = {
       document.querySelectorAll('.lightbox-trigger').forEach((img) => {
         img.addEventListener('click', () => {
           const images = img.getAttribute('data-images').split(',');
-          const clickedSrc = img.getAttribute('src');
-          const startIndex = images.indexOf(clickedSrc);
-          openLightbox(images, startIndex >= 0 ? startIndex : 0);
+          openLightbox(images, 0);
         });
       });
 

@@ -2,12 +2,13 @@
 import { getCollection } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { FLOWER_SPECIES } from '../data/flowerSpecies';
+import { productPriceBuckets, minPrice } from '../data/pricing';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 const products = await getCollection('products');
 
 const ranges = ['100-200', '200-400', '400-600', '600-800', '1000+'];
-const sizes = ['S', 'M', 'L', 'XL'];
+const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 const initialVisibleSpeciesCount = 5;
 
 const labels = {
@@ -15,16 +16,19 @@ const labels = {
     all: 'Wszystkie', wedding: 'Ślub', promo: 'Akcja', handmade: 'Rękodzieło', featured: 'Polecane', currency: 'zł', addToCart: 'Do koszyka',
     compositionTitle: 'Skład bukietu:', sizeTitle: 'Rozmiar:', reset: 'wyczyść',
     showMore: (n) => `pokaż jeszcze ${n}`, showLess: 'ukryj',
+    from: (p) => `od ${p} zł`, chooseSize: 'Wybierz rozmiar',
   },
   ru: {
     all: 'Все', wedding: 'Свадьба', promo: 'Акция', handmade: 'Ручная работа', featured: 'Рекомендуем', currency: 'zł', addToCart: 'В корзину',
     compositionTitle: 'Состав букета:', sizeTitle: 'Размер:', reset: 'сбросить',
     showMore: (n) => `показать ещё ${n}`, showLess: 'скрыть',
+    from: (p) => `от ${p} zł`, chooseSize: 'Выбрать размер',
   },
   en: {
     all: 'All', wedding: 'Wedding', promo: 'Promo', handmade: 'Handmade', featured: 'Featured', currency: 'zł', addToCart: 'Add to cart',
     compositionTitle: 'Composition:', sizeTitle: 'Size:', reset: 'clear',
     showMore: (n) => `show ${n} more`, showLess: 'hide',
+    from: (p) => `from ${p} zł`, chooseSize: 'Choose size',
   },
 };
 const t = labels[currentLocale] ?? labels.pl;
@@ -90,15 +94,23 @@ const t = labels[currentLocale] ?? labels.pl;
     </aside>
 
     <div class="catalog-grid">
-      {products.map((product, index) => (
+      {products.map((product, index) => {
+        const prices = product.data.variants.map((v) => v.price);
+        const priceBuckets = productPriceBuckets(prices).join(' ');
+        const productSizes = product.data.variants.map((v) => v.size).filter(Boolean).join(' ');
+        const lowestPrice = minPrice(prices);
+        const hasMultipleVariants = product.data.variants.length > 1;
+        const productUrl = getRelativeLocaleUrl(currentLocale, `/product/${product.id}`);
+
+        return (
           <div
             class="product-card reveal"
             style={`transition-delay: ${Math.min(index * 60, 300)}ms`}
-            data-price-range={product.data.priceRange}
+            data-price-ranges={priceBuckets}
             data-wedding={product.data.wedding ? 'true' : 'false'}
             data-promo={product.data.promo ? 'true' : 'false'}
             data-handmade={product.data.handmade ? 'true' : 'false'}
-            data-size={product.data.size ?? ''}
+            data-size={productSizes}
             data-composition={(product.data.composition ?? []).join(',')}
           >
             {product.data.featured && <span class="product-badge">{t.featured}</span>}
@@ -106,33 +118,38 @@ const t = labels[currentLocale] ?? labels.pl;
               class="favorite-btn"
               data-favorite-id={product.id}
               data-favorite-title={product.data.title[currentLocale]}
-              data-favorite-price={product.data.price}
+              data-favorite-price={lowestPrice}
               data-favorite-cover={product.data.cover}
               aria-label="Favorite"
             >♥</button>
-            <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-image-link">
+            <a href={productUrl} class="product-image-link">
               <img
                 src={`/images/products/${product.data.cover}`}
                 alt={product.data.title[currentLocale]}
                 class="product-img"
               />
             </a>
-            <a href={getRelativeLocaleUrl(currentLocale, `/product/${product.id}`)} class="product-title-link">
+            <a href={productUrl} class="product-title-link">
               <h3 class="product-title">{product.data.title[currentLocale]}</h3>
             </a>
             <p class="product-description">{product.data.description[currentLocale]}</p>
-            <p class="product-price">{product.data.price} {t.currency}</p>
-            <button
-              class="add-to-cart-btn"
-              data-id={product.id}
-              data-title={product.data.title[currentLocale]}
-              data-price={product.data.price}
-              data-cover={product.data.cover}
-            >
-              {t.addToCart}
-            </button>
+            <p class="product-price">{hasMultipleVariants ? t.from(lowestPrice) : `${lowestPrice} ${t.currency}`}</p>
+            {hasMultipleVariants ? (
+              <a href={productUrl} class="add-to-cart-btn">{t.chooseSize}</a>
+            ) : (
+              <button
+                class="add-to-cart-btn"
+                data-id={product.id}
+                data-title={product.data.title[currentLocale]}
+                data-price={lowestPrice}
+                data-cover={product.data.cover}
+              >
+                {t.addToCart}
+              </button>
+            )}
           </div>
-      ))}
+        );
+      })}
     </div>
   </div>
 </div>
@@ -216,6 +233,12 @@ const t = labels[currentLocale] ?? labels.pl;
     padding: 0;
   }
 
+  a.add-to-cart-btn {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+  }
+
   @media (max-width: 480px) {
     .catalog-layout {
       flex-direction: column;
@@ -250,9 +273,14 @@ const t = labels[currentLocale] ?? labels.pl;
       .map((cb) => cb.getAttribute('data-species'));
   }
 
+  function cardSizeList(card) {
+    return (card.getAttribute('data-size') || '').split(' ').filter(Boolean);
+  }
+
   function cardMatchesSize(card, sizes) {
     if (sizes.length === 0) return true;
-    return sizes.includes(card.getAttribute('data-size'));
+    const cardSizes = cardSizeList(card);
+    return sizes.some((s) => cardSizes.includes(s));
   }
 
   function cardMatchesComposition(card, species) {
@@ -261,12 +289,18 @@ const t = labels[currentLocale] ?? labels.pl;
     return species.some((s) => cardSpecies.includes(s));
   }
 
+  function cardMatchesPrice(card, price) {
+    if (price === 'all') return true;
+    const cardRanges = (card.getAttribute('data-price-ranges') || '').split(' ').filter(Boolean);
+    return cardRanges.includes(price);
+  }
+
   function filterCards() {
     const selectedSizes = getSelectedSizes();
     const selectedComposition = getSelectedComposition();
 
     cards.forEach((card) => {
-      const priceMatch = selectedPrice === 'all' || card.getAttribute('data-price-range') === selectedPrice;
+      const priceMatch = cardMatchesPrice(card, selectedPrice);
       const categoryMatch =
         selectedCategory === 'all' ||
         card.getAttribute(`data-${selectedCategory}`) === 'true';
@@ -286,8 +320,7 @@ const t = labels[currentLocale] ?? labels.pl;
     const availableSizes = new Set();
     cards.forEach((card) => {
       if (cardMatchesComposition(card, selectedComposition)) {
-        const s = card.getAttribute('data-size');
-        if (s) availableSizes.add(s);
+        cardSizeList(card).forEach((s) => availableSizes.add(s));
       }
     });
     sizeCheckboxes.forEach((cb) => {
@@ -380,6 +413,9 @@ const t = labels[currentLocale] ?? labels.pl;
   updateFacetAvailability();
 
   document.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+    // Для товаров с несколькими вариантами это <a>, ведущая на страницу товара —
+    // там нет data-id, и слушатель добавления в корзину ей не нужен.
+    if (!btn.hasAttribute('data-id')) return;
     const originalText = btn.textContent;
     btn.addEventListener('click', () => {
       if (!window.AuraCart) return;

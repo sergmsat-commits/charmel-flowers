@@ -69,6 +69,15 @@ const allImages = [product.data.cover, ...(product.data.gallery ?? [])]
 
 const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
 
+// Варианты товара (размер + цена). У большинства товаров пока один вариант —
+// тогда просто показываем его цену без переключателя размеров.
+const variants = product.data.variants;
+const hasMultipleVariants = variants.length > 1;
+const defaultVariant = variants[0];
+const variantPrices = variants.map((v) => v.price);
+const lowestPrice = Math.min(...variantPrices);
+const highestPrice = Math.max(...variantPrices);
+
 const productUrl = `https://charmelflowers.pl${Astro.url.pathname}`;
 const productSchema = {
   '@context': 'https://schema.org',
@@ -76,13 +85,23 @@ const productSchema = {
   name: product.data.title[currentLocale],
   description: product.data.description[currentLocale],
   image: `https://charmelflowers.pl/images/products/${product.data.cover}`,
-  offers: {
-    '@type': 'Offer',
-    price: product.data.price,
-    priceCurrency: 'PLN',
-    availability: 'https://schema.org/InStock',
-    url: productUrl,
-  },
+  offers: hasMultipleVariants
+    ? {
+        '@type': 'AggregateOffer',
+        lowPrice: lowestPrice,
+        highPrice: highestPrice,
+        priceCurrency: 'PLN',
+        offerCount: variants.length,
+        availability: 'https://schema.org/InStock',
+        url: productUrl,
+      }
+    : {
+        '@type': 'Offer',
+        price: defaultVariant.price,
+        priceCurrency: 'PLN',
+        availability: 'https://schema.org/InStock',
+        url: productUrl,
+      },
 };
 ---
 
@@ -115,11 +134,29 @@ const productSchema = {
     <div class="product-detail-info">
       <h1>{product.data.title[currentLocale]}</h1>
       <p class="product-detail-description">{product.data.description[currentLocale]}</p>
-      <p class="product-detail-price">{product.data.price} {t.currency}</p>
+      <p class="product-detail-price" id="product-detail-price">{defaultVariant.price} {t.currency}</p>
 
-      {product.data.size && (
+      {hasMultipleVariants && (
+        <div class="variant-selector">
+          <span class="variant-selector-label">{t.sizeLabel}:</span>
+          <div class="variant-options">
+            {variants.map((v, i) => (
+              <button
+                type="button"
+                class={`variant-option${i === 0 ? ' active' : ''}`}
+                data-variant-size={v.size}
+                data-variant-price={v.price}
+              >
+                {v.size}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!hasMultipleVariants && defaultVariant.size && (
         <p class="product-detail-meta">
-          <span class="product-detail-meta-label">{t.sizeLabel}:</span> <strong>{product.data.size}</strong>
+          <span class="product-detail-meta-label">{t.sizeLabel}:</span> <strong>{defaultVariant.size}</strong>
         </p>
       )}
 
@@ -183,9 +220,11 @@ const productSchema = {
         type="button"
         class="add-to-cart-btn product-detail-add-btn"
         id="product-detail-add-btn"
-        data-id={product.id}
-        data-title={product.data.title[currentLocale]}
-        data-price={product.data.price}
+        data-product-id={product.id}
+        data-base-title={product.data.title[currentLocale]}
+        data-id={hasMultipleVariants ? `${product.id}--${defaultVariant.size}` : product.id}
+        data-title={hasMultipleVariants ? `${product.data.title[currentLocale]} (${defaultVariant.size})` : product.data.title[currentLocale]}
+        data-price={defaultVariant.price}
         data-cover={product.data.cover}
       >
         {t.addToCart}
@@ -225,6 +264,42 @@ const productSchema = {
   .product-detail-meta-label {
     color: var(--color-accent);
   }
+
+  .variant-selector {
+    margin: 10px 0 16px;
+  }
+
+  .variant-selector-label {
+    display: block;
+    font-family: var(--font-body);
+    color: var(--color-accent);
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .variant-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .variant-option {
+    font-family: var(--font-body);
+    background: var(--color-primary);
+    color: var(--color-text);
+    border: 1px solid var(--color-primary-dark);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .variant-option.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-white);
+  }
 </style>
 
 <script>
@@ -240,7 +315,31 @@ const productSchema = {
     });
   }
 
+  const priceEl = document.getElementById('product-detail-price');
   const addBtn = document.getElementById('product-detail-add-btn');
+  const variantButtons = document.querySelectorAll('.variant-option');
+
+  variantButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      variantButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const size = btn.getAttribute('data-variant-size');
+      const price = btn.getAttribute('data-variant-price');
+
+      if (priceEl) {
+        priceEl.textContent = `${price} zł`;
+      }
+      if (addBtn) {
+        const productId = addBtn.getAttribute('data-product-id');
+        const baseTitle = addBtn.getAttribute('data-base-title');
+        addBtn.setAttribute('data-id', `${productId}--${size}`);
+        addBtn.setAttribute('data-price', price);
+        addBtn.setAttribute('data-title', `${baseTitle} (${size})`);
+      }
+    });
+  });
+
   if (addBtn) {
     const originalText = addBtn.textContent;
     addBtn.addEventListener('click', () => {
