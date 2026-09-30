@@ -10,10 +10,13 @@ const products = defineCollection({
       ru: z.string(),
       en: z.string(),
     }),
+    // Описание разбито на абзацы: первый абзац — обычно вступление (без
+    // подписи), последующие могут иметь label ("Состав" / "Детали" /
+    // "Особенность" и т.п.), который в вёрстке выводится жирным перед текстом.
     description: z.object({
-      pl: z.string(),
-      ru: z.string(),
-      en: z.string(),
+      pl: z.array(z.object({ label: z.string().optional(), text: z.string() })).min(1),
+      ru: z.array(z.object({ label: z.string().optional(), text: z.string() })).min(1),
+      en: z.array(z.object({ label: z.string().optional(), text: z.string() })).min(1),
     }),
     // Каждый товар — список вариантов (размер + цена). У большинства сейчас
     // всего один вариант (без size) — это ок, size опционален.

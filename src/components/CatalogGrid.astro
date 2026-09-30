@@ -17,18 +17,21 @@ const labels = {
     compositionTitle: 'Skład bukietu:', sizeTitle: 'Rozmiar:', reset: 'wyczyść',
     showMore: (n) => `pokaż jeszcze ${n}`, showLess: 'ukryj',
     from: (p) => `od ${p} zł`, chooseSize: 'Wybierz rozmiar',
+    descMore: 'Zobacz więcej', descLess: 'Zwiń',
   },
   ru: {
     all: 'Все', wedding: 'Свадьба', promo: 'Акция', handmade: 'Ручная работа', featured: 'Рекомендуем', currency: 'zł', addToCart: 'В корзину',
     compositionTitle: 'Состав букета:', sizeTitle: 'Размер:', reset: 'сбросить',
     showMore: (n) => `показать ещё ${n}`, showLess: 'скрыть',
     from: (p) => `от ${p} zł`, chooseSize: 'Выбрать размер',
+    descMore: 'Смотреть полностью', descLess: 'Свернуть',
   },
   en: {
     all: 'All', wedding: 'Wedding', promo: 'Promo', handmade: 'Handmade', featured: 'Featured', currency: 'zł', addToCart: 'Add to cart',
     compositionTitle: 'Composition:', sizeTitle: 'Size:', reset: 'clear',
     showMore: (n) => `show ${n} more`, showLess: 'hide',
     from: (p) => `from ${p} zł`, chooseSize: 'Choose size',
+    descMore: 'Show more', descLess: 'Show less',
   },
 };
 const t = labels[currentLocale] ?? labels.pl;
@@ -101,6 +104,8 @@ const t = labels[currentLocale] ?? labels.pl;
         const lowestPrice = minPrice(prices);
         const hasMultipleVariants = product.data.variants.length > 1;
         const productUrl = getRelativeLocaleUrl(currentLocale, `/product/${product.id}`);
+        const descriptionParagraphs = product.data.description[currentLocale] ?? [];
+        const descriptionIntro = descriptionParagraphs[0]?.text ?? '';
 
         return (
           <div
@@ -132,7 +137,25 @@ const t = labels[currentLocale] ?? labels.pl;
             <a href={productUrl} class="product-title-link">
               <h3 class="product-title">{product.data.title[currentLocale]}</h3>
             </a>
-            <p class="product-description">{product.data.description[currentLocale]}</p>
+            <div class="product-description-wrap">
+              <p class="product-description product-description-preview">{descriptionIntro}</p>
+              <div class="product-description-full">
+                {descriptionParagraphs.map((p) => (
+                  <p>
+                    {p.label && <strong>{p.label}: </strong>}
+                    {p.text}
+                  </p>
+                ))}
+              </div>
+              <button
+                type="button"
+                class="description-toggle-btn"
+                data-show-more={t.descMore}
+                data-show-less={t.descLess}
+              >
+                {t.descMore}
+              </button>
+            </div>
             <p class="product-price">{hasMultipleVariants ? t.from(lowestPrice) : `${lowestPrice} ${t.currency}`}</p>
             {hasMultipleVariants ? (
               <a href={productUrl} class="add-to-cart-btn">{t.chooseSize}</a>
@@ -237,6 +260,42 @@ const t = labels[currentLocale] ?? labels.pl;
     display: inline-block;
     text-align: center;
     text-decoration: none;
+  }
+
+  .product-description-wrap {
+    padding: 0 16px 4px;
+  }
+
+  .product-description-preview {
+    padding: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-description-full {
+    display: none;
+  }
+
+  .product-description-full p {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .product-description-full p strong {
+    color: var(--color-accent);
+  }
+
+  .description-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0 0 8px;
   }
 
   @media (max-width: 480px) {
@@ -429,6 +488,21 @@ const t = labels[currentLocale] ?? labels.pl;
       setTimeout(() => {
         btn.textContent = originalText;
       }, 1000);
+    });
+  });
+
+  document.querySelectorAll('.description-toggle-btn').forEach((btn) => {
+    const wrap = btn.closest('.product-description-wrap');
+    if (!wrap) return;
+    const preview = wrap.querySelector('.product-description-preview');
+    const full = wrap.querySelector('.product-description-full');
+    btn.addEventListener('click', () => {
+      const isHidden = !full || full.style.display === 'none' || full.style.display === '';
+      if (full) full.style.display = isHidden ? 'block' : 'none';
+      if (preview) preview.style.display = isHidden ? 'none' : '';
+      btn.textContent = isHidden
+        ? btn.getAttribute('data-show-less')
+        : btn.getAttribute('data-show-more');
     });
   });
 

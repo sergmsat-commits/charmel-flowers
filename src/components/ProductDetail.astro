@@ -78,12 +78,15 @@ const variantPrices = variants.map((v) => v.price);
 const lowestPrice = Math.min(...variantPrices);
 const highestPrice = Math.max(...variantPrices);
 
+const descriptionParagraphs = product.data.description[currentLocale] ?? [];
+const descriptionPlainText = descriptionParagraphs.map((p) => p.text).join(' ');
+
 const productUrl = `https://charmelflowers.pl${Astro.url.pathname}`;
 const productSchema = {
   '@context': 'https://schema.org',
   '@type': 'Product',
   name: product.data.title[currentLocale],
-  description: product.data.description[currentLocale],
+  description: descriptionPlainText,
   image: `https://charmelflowers.pl/images/products/${product.data.cover}`,
   offers: hasMultipleVariants
     ? {
@@ -133,7 +136,14 @@ const productSchema = {
 
     <div class="product-detail-info">
       <h1>{product.data.title[currentLocale]}</h1>
-      <p class="product-detail-description">{product.data.description[currentLocale]}</p>
+      <div class="product-detail-description">
+        {descriptionParagraphs.map((p) => (
+          <p>
+            {p.label && <strong>{p.label}: </strong>}
+            {p.text}
+          </p>
+        ))}
+      </div>
       <p class="product-detail-price" id="product-detail-price">{defaultVariant.price} {t.currency}</p>
 
       {hasMultipleVariants && (
@@ -252,6 +262,14 @@ const productSchema = {
 
   .product-detail-thumb:hover {
     opacity: 0.8;
+  }
+
+  .product-detail-description p {
+    margin-bottom: 12px;
+  }
+
+  .product-detail-description p strong {
+    color: var(--color-accent);
   }
 
   .product-detail-meta {
