@@ -41,6 +41,8 @@ composition:
   - "hydrangea"
   - "spray-rose"
   - "nigella"
+sections:
+  - "author"
 cover: "hydrangea-05.jpg"
 gallery:
   - "hydrangea-05-1.jpg"

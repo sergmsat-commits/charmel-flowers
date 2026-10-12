@@ -43,6 +43,8 @@ composition:
   - "dianthus"
   - "chamomile"
 featured: true
+sections:
+  - "author"
 cover: "sunflower-01.jpg"
 gallery:
   - "sunflower-01-1.jpg"

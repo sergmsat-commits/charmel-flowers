@@ -42,6 +42,8 @@ composition:
   - "delphinium"
   - "eustoma"
   - "panicum"
+sections:
+  - "author"
 cover: "delphinium-01.jpg"
 gallery:
   - "delphinium-01-1.jpg"

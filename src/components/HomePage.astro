@@ -4,6 +4,7 @@ import Reviews from './Reviews.astro';
 import LocationMap from './LocationMap.astro';
 import PromoSlider from './PromoSlider.astro';
 import FeaturedStrip from './FeaturedStrip.astro';
+import CategoryTiles from './CategoryTiles.astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
@@ -11,17 +12,17 @@ const currentLocale = Astro.currentLocale ?? 'pl';
 const hero = {
   pl: {
     subtitle: 'Dobierzemy idealny bukiet dla Ciebie',
-    delivery: '⚡ Bukiet gotowy w 15 minut*',
+    delivery: '⚡ Bukiet gotowy w dniu zamówienia*',
     cta: 'Zobacz katalog',
   },
   ru: {
     subtitle: 'Подберём идеальный букет для тебя',
-    delivery: '⚡ Букет готов за 15 минут*',
+    delivery: '⚡ Букет готов в день заказа*',
     cta: 'Смотреть каталог',
   },
   en: {
     subtitle: "We'll find the perfect bouquet for you",
-    delivery: '⚡ Bouquet ready in 15 minutes*',
+    delivery: '⚡ Bouquet ready on the day of order*',
     cta: 'View Catalog',
   },
 };
@@ -48,6 +49,7 @@ const t = hero[currentLocale] ?? hero.pl;
 </section>
 
 <PromoSlider />
+<CategoryTiles />
 <FeaturedStrip />
 <AboutUs />
 <Reviews />

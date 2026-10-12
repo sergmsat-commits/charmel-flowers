@@ -41,6 +41,8 @@ composition:
   - "hydrangea"
   - "rose"
   - "nigella"
+sections:
+  - "author"
 cover: "hydrangea-02.jpg"
 gallery:
   - "hydrangea-02-1.jpg"

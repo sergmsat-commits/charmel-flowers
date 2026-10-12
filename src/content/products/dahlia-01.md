@@ -40,6 +40,8 @@ variants:
 composition:
   - "dahlia"
   - "eustoma"
+sections:
+  - "mono"
 cover: "dahlia-01.jpg"
 gallery:
   - "dahlia-01-1.jpg"

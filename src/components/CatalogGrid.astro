@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { FLOWER_SPECIES } from '../data/flowerSpecies';
 import { productPriceBuckets, minPrice } from '../data/pricing';
+import { SECTIONS } from '../data/sections';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 const products = await getCollection('products');
@@ -14,6 +15,7 @@ const initialVisibleSpeciesCount = 5;
 const labels = {
   pl: {
     all: 'Wszystkie', wedding: 'Ślub', promo: 'Akcja', handmade: 'Rękodzieło', featured: 'Polecane', currency: 'zł', addToCart: 'Do koszyka',
+    emptySection: 'Wkrótce dodamy tutaj nowe bukiety.',
     compositionTitle: 'Skład bukietu:', sizeTitle: 'Rozmiar:', reset: 'wyczyść',
     showMore: (n) => `pokaż jeszcze ${n}`, showLess: 'ukryj',
     from: (p) => `od ${p} zł`, chooseSize: 'Wybierz rozmiar',
@@ -21,6 +23,7 @@ const labels = {
   },
   ru: {
     all: 'Все', wedding: 'Свадьба', promo: 'Акция', handmade: 'Ручная работа', featured: 'Рекомендуем', currency: 'zł', addToCart: 'В корзину',
+    emptySection: 'Скоро здесь появятся новые букеты.',
     compositionTitle: 'Состав букета:', sizeTitle: 'Размер:', reset: 'сбросить',
     showMore: (n) => `показать ещё ${n}`, showLess: 'скрыть',
     from: (p) => `от ${p} zł`, chooseSize: 'Выбрать размер',
@@ -28,6 +31,7 @@ const labels = {
   },
   en: {
     all: 'All', wedding: 'Wedding', promo: 'Promo', handmade: 'Handmade', featured: 'Featured', currency: 'zł', addToCart: 'Add to cart',
+    emptySection: 'New bouquets are coming here soon.',
     compositionTitle: 'Composition:', sizeTitle: 'Size:', reset: 'clear',
     showMore: (n) => `show ${n} more`, showLess: 'hide',
     from: (p) => `from ${p} zł`, chooseSize: 'Choose size',
@@ -42,6 +46,13 @@ const t = labels[currentLocale] ?? labels.pl;
     <button class="filter-btn active" data-filter-group="price" data-value="all">{t.all}</button>
     {ranges.map((r) => (
       <button class="filter-btn" data-filter-group="price" data-value={r}>{r}</button>
+    ))}
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter-group="section" data-value="all">{t.all}</button>
+    {SECTIONS.map((s) => (
+      <button class="filter-btn" data-filter-group="section" data-value={s.slug}>{s[currentLocale] ?? s.ru}</button>
     ))}
   </div>
 
@@ -115,6 +126,7 @@ const t = labels[currentLocale] ?? labels.pl;
             data-wedding={product.data.wedding ? 'true' : 'false'}
             data-promo={product.data.promo ? 'true' : 'false'}
             data-handmade={product.data.handmade ? 'true' : 'false'}
+            data-sections={(product.data.sections ?? []).join(' ')}
             data-size={productSizes}
             data-composition={(product.data.composition ?? []).join(',')}
           >
@@ -173,11 +185,21 @@ const t = labels[currentLocale] ?? labels.pl;
           </div>
         );
       })}
+      <p class="catalog-empty" id="catalog-empty" hidden>{t.emptySection}</p>
     </div>
   </div>
 </div>
 
 <style>
+  .catalog-empty {
+    grid-column: 1 / -1;
+    padding: 48px 16px;
+    text-align: center;
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: 1.1rem;
+  }
+
   .catalog-layout {
     display: flex;
     gap: 32px;
@@ -313,12 +335,15 @@ const t = labels[currentLocale] ?? labels.pl;
 <script>
   const priceButtons = document.querySelectorAll('.filter-btn[data-filter-group="price"]');
   const categoryButtons = document.querySelectorAll('.filter-btn[data-filter-group="category"]');
+  const sectionButtons = document.querySelectorAll('.filter-btn[data-filter-group="section"]');
+  const emptyMsg = document.getElementById('catalog-empty');
   const sizeCheckboxes = document.querySelectorAll('.size-checkbox');
   const compositionCheckboxes = document.querySelectorAll('.composition-checkbox');
   const cards = document.querySelectorAll('.product-card');
 
   let selectedPrice = 'all';
   let selectedCategory = 'all';
+  let selectedSection = 'all';
 
   function getSelectedSizes() {
     return Array.from(sizeCheckboxes)
@@ -357,6 +382,7 @@ const t = labels[currentLocale] ?? labels.pl;
   function filterCards() {
     const selectedSizes = getSelectedSizes();
     const selectedComposition = getSelectedComposition();
+    let visibleCount = 0;
 
     cards.forEach((card) => {
       const priceMatch = cardMatchesPrice(card, selectedPrice);
@@ -365,8 +391,14 @@ const t = labels[currentLocale] ?? labels.pl;
         card.getAttribute(`data-${selectedCategory}`) === 'true';
       const sizeMatch = cardMatchesSize(card, selectedSizes);
       const compositionMatch = cardMatchesComposition(card, selectedComposition);
-      card.style.display = priceMatch && categoryMatch && sizeMatch && compositionMatch ? '' : 'none';
+      const sectionMatch =
+        selectedSection === 'all' ||
+        (card.getAttribute('data-sections') || '').split(' ').includes(selectedSection);
+      const visible = priceMatch && categoryMatch && sectionMatch && sizeMatch && compositionMatch;
+      card.style.display = visible ? '' : 'none';
+      if (visible) visibleCount += 1;
     });
+    if (emptyMsg) emptyMsg.hidden = visibleCount > 0;
   }
 
   // Возвращает true, если пришлось принудительно снять галочку с недоступного варианта
@@ -439,6 +471,25 @@ const t = labels[currentLocale] ?? labels.pl;
       applyAllFilters();
     });
   });
+
+  sectionButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setSection(btn.getAttribute('data-value'));
+      applyAllFilters();
+    });
+  });
+
+  function setSection(value) {
+    sectionButtons.forEach((b) => b.classList.toggle('active', b.getAttribute('data-value') === value));
+    selectedSection = value;
+  }
+
+  // переход с главной: /catalog?section=mono
+  const sectionFromUrl = new URLSearchParams(window.location.search).get('section');
+  if (sectionFromUrl && Array.from(sectionButtons).some((b) => b.getAttribute('data-value') === sectionFromUrl)) {
+    setSection(sectionFromUrl);
+    applyAllFilters();
+  }
 
   sizeCheckboxes.forEach((cb) => cb.addEventListener('change', applyAllFilters));
   compositionCheckboxes.forEach((cb) => cb.addEventListener('change', applyAllFilters));

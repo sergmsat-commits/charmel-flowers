@@ -41,6 +41,8 @@ composition:
   - "hydrangea"
   - "dahlia"
   - "nigella"
+sections:
+  - "author"
 cover: "hydrangea-04.jpg"
 gallery:
   - "hydrangea-04-1.jpg"

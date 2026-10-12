@@ -41,6 +41,8 @@ variants:
     price: 535
 composition:
   - "hydrangea"
+sections:
+  - "mono"
 cover: "hydrangea-03.jpg"
 gallery:
   - "hydrangea-03-1.jpg"

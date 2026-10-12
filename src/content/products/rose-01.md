@@ -42,6 +42,9 @@ variants:
 composition:
   - "spray-peony-rose"
 featured: true
+sections:
+  - "mono"
+  - "roses"
 cover: "rose-01.jpg"
 gallery:
   - "rose-01-1.jpg"

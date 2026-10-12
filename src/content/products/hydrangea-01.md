@@ -45,6 +45,8 @@ composition:
   - "rose"
   - "eucalyptus"
 featured: true
+sections:
+  - "author"
 cover: "hydrangea-01.jpg"
 gallery:
   - "hydrangea-01-1.jpg"

@@ -1,6 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { FLOWER_SPECIES_SLUGS } from './data/flowerSpecies';
+import { SECTION_SLUGS } from './data/sections';
 
 const products = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/products' }),
@@ -35,6 +36,8 @@ const products = defineCollection({
     handmade: z.boolean().optional().default(false),
     cover: z.string(),
     gallery: z.array(z.string()).optional().default([]),
+    // Разделы каталога (Моно/дуо, Сухоцветы, Авторский, Розы). Букет может быть в нескольких.
+    sections: z.array(z.enum(SECTION_SLUGS)).optional().default([]),
     featured: z.boolean().optional().default(false),
     composition: z.array(z.enum(FLOWER_SPECIES_SLUGS)).optional().default([]),
   }),
