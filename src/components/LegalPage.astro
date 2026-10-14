@@ -1,0 +1,192 @@
+---
+// Общий шаблон для юридических страниц (Regulamin, Polityka prywatności).
+// Тексты лежат в src/data/regulamin.ts и src/data/privacy.ts.
+import type { LegalDoc } from '../data/legal-types';
+
+interface Props {
+  doc: LegalDoc;
+}
+const { doc } = Astro.props;
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const printLabel = {
+  pl: 'Drukuj / zapisz jako PDF',
+  ru: 'Распечатать / сохранить в PDF',
+  en: 'Print / save as PDF',
+}[currentLocale] ?? 'Drukuj / zapisz jako PDF';
+
+// Делает кликабельными ссылки https://… и адреса e-mail внутри текста.
+const LINK_RE = /(https?:\/\/[^\s]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g;
+function linkify(text: string) {
+  const parts: { text: string; href?: string }[] = [];
+  let last = 0;
+  for (const m of text.matchAll(LINK_RE)) {
+    let raw = m[0];
+    // не захватываем точку/запятую/скобку в конце предложения
+    const trail = raw.match(/[.,;)]+$/)?.[0] ?? '';
+    if (trail) raw = raw.slice(0, -trail.length);
+    const start = m.index ?? 0;
+    if (start > last) parts.push({ text: text.slice(last, start) });
+    parts.push({ text: raw, href: raw.includes('@') && !raw.startsWith('http') ? `mailto:${raw}` : raw });
+    last = start + raw.length;
+  }
+  if (last < text.length) parts.push({ text: text.slice(last) });
+  return parts;
+}
+---
+
+<article class="legal-page">
+  <h1>{doc.title}</h1>
+  {doc.note && <p class="legal-note">{doc.note}</p>}
+  <p class="legal-effective">{doc.effectiveLabel}: {doc.effective}</p>
+  <button type="button" class="legal-print-btn" onclick="window.print()">{printLabel}</button>
+
+  {doc.sections.map((section) => (
+    <section class="legal-section">
+      <h2>{section.h}</h2>
+      {section.blocks.map((block) => {
+        if ('p' in block) {
+          return <p>{linkify(block.p).map((part) => part.href ? <a href={part.href} target={part.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{part.text}</a> : part.text)}</p>;
+        }
+        if ('ul' in block) {
+          return (
+            <ul>
+              {block.ul.map((li) => (
+                <li>{linkify(li).map((part) => part.href ? <a href={part.href} target={part.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{part.text}</a> : part.text)}</li>
+              ))}
+            </ul>
+          );
+        }
+        if ('ol' in block) {
+          return (
+            <ol>
+              {block.ol.map((item) => {
+                const text = typeof item === 'string' ? item : item.t;
+                const sub = typeof item === 'string' ? null : item.ul;
+                return (
+                  <li>
+                    {linkify(text).map((part) => part.href ? <a href={part.href} target={part.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{part.text}</a> : part.text)}
+                    {sub && (
+                      <ul>
+                        {sub.map((li) => (
+                          <li>{linkify(li).map((part) => part.href ? <a href={part.href} target={part.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{part.text}</a> : part.text)}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          );
+        }
+        if ('box' in block) {
+          return (
+            <div class="legal-box">
+              {block.box.map((line) => <p>{linkify(line).map((part) => part.href ? <a href={part.href}>{part.text}</a> : part.text)}</p>)}
+            </div>
+          );
+        }
+        return null;
+      })}
+    </section>
+  ))}
+</article>
+
+<style>
+  .legal-page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 8px 16px 48px;
+    color: var(--color-text);
+    line-height: 1.65;
+    font-size: 0.98rem;
+  }
+
+  .legal-page h1 {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+    margin-bottom: 8px;
+  }
+
+  .legal-note {
+    background: var(--color-primary);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+  }
+
+  .legal-effective {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .legal-print-btn {
+    margin: 4px 0 24px;
+    background: none;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+
+  .legal-print-btn:hover {
+    background: var(--color-accent);
+    color: var(--color-white, #fff);
+  }
+
+  .legal-section h2 {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: 1.15rem;
+    margin: 28px 0 10px;
+  }
+
+  .legal-section ol,
+  .legal-section ul {
+    padding-left: 22px;
+    margin: 0 0 12px;
+  }
+
+  .legal-section li {
+    margin-bottom: 8px;
+  }
+
+  .legal-section li ul {
+    margin-top: 6px;
+  }
+
+  .legal-section a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    word-break: break-word;
+  }
+
+  .legal-box {
+    border: 1px solid var(--color-primary-dark);
+    border-radius: 8px;
+    padding: 14px 18px;
+    background: var(--color-white, #fff);
+  }
+
+  .legal-box p {
+    margin: 0 0 10px;
+  }
+
+  @media print {
+    :global(.top-bar),
+    :global(.site-header),
+    :global(.site-footer),
+    :global(.contact-widget),
+    .legal-print-btn {
+      display: none !important;
+    }
+    .legal-page {
+      max-width: none;
+      padding: 0;
+      font-size: 11pt;
+    }
+  }
+</style>

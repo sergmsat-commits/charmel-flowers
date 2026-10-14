@@ -1,0 +1,104 @@
+---
+// Блок «Реквизиты фирмы» для страницы «Контакты».
+// Данные берутся из src/data/company.ts.
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { COMPANY, COMPANY_ADDRESS } from '../data/company';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const labels = {
+  pl: { title: 'Dane firmy', company: 'Firma', address: 'Adres siedziby i do doręczeń', phone: 'Telefon', email: 'E-mail', regulamin: 'Regulamin sklepu', privacy: 'Polityka prywatności' },
+  ru: { title: 'Реквизиты фирмы', company: 'Фирма', address: 'Юридический адрес и адрес для корреспонденции', phone: 'Телефон', email: 'E-mail', regulamin: 'Правила магазина (Regulamin)', privacy: 'Политика конфиденциальности' },
+  en: { title: 'Company details', company: 'Business name', address: 'Registered and postal address', phone: 'Phone', email: 'E-mail', regulamin: 'Terms and Conditions (Regulamin)', privacy: 'Privacy Policy' },
+};
+const t = labels[currentLocale] ?? labels.pl;
+---
+
+<section class="company-info">
+  <h2>{t.title}</h2>
+  <dl>
+    <dt>{t.company}</dt>
+    <dd>{COMPANY.name}</dd>
+
+    <dt>{t.address}</dt>
+    <dd>{COMPANY_ADDRESS}</dd>
+
+    <dt>NIP</dt>
+    <dd>{COMPANY.nip}</dd>
+
+    <dt>REGON</dt>
+    <dd>{COMPANY.regon}</dd>
+
+    <dt>{t.phone}</dt>
+    <dd><a href={COMPANY.phoneHref}>{COMPANY.phone}</a></dd>
+
+    <dt>{t.email}</dt>
+    <dd><a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a></dd>
+  </dl>
+  <p class="company-info-links">
+    <a href={getRelativeLocaleUrl(currentLocale, '/regulamin')}>{t.regulamin}</a>
+    <span aria-hidden="true">·</span>
+    <a href={getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci')}>{t.privacy}</a>
+  </p>
+</section>
+
+<style>
+  .company-info {
+    max-width: 820px;
+    margin: 40px auto;
+    padding: 24px 20px;
+    background: var(--color-white, #fff);
+    border: 1px solid var(--color-primary-dark);
+    border-radius: 10px;
+    color: var(--color-text);
+  }
+
+  .company-info h2 {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    margin: 0 0 16px;
+    font-size: 1.35rem;
+  }
+
+  .company-info dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 20px;
+    margin: 0;
+  }
+
+  .company-info dt {
+    font-weight: bold;
+  }
+
+  .company-info dd {
+    margin: 0;
+    word-break: break-word;
+  }
+
+  .company-info a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .company-info-links {
+    margin: 18px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .company-info {
+      margin: 28px 12px;
+      padding: 18px 14px;
+    }
+    .company-info dl {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+    .company-info dd {
+      margin-bottom: 10px;
+    }
+  }
+</style>

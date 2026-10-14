@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import LegalPage from '../../components/LegalPage.astro';
+import { PRIVACY } from '../../data/privacy';
+
+const title = 'Политика конфиденциальности | Charmel Flowers';
+const description = 'Политика конфиденциальности Charmel Flowers: как мы обрабатываем персональные данные клиентов и получателей.';
+---
+
+<Layout title={title} description={description}>
+  <LegalPage doc={PRIVACY.ru} />
+</Layout>

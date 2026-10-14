@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
+import { COMPANY } from '../data/company';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 
@@ -13,6 +14,7 @@ const content = {
     buyerHeading: 'Dane zamawiającego',
     buyerName: 'Imię i nazwisko',
     buyerPhone: 'Telefon',
+    buyerEmail: 'E-mail (wyślemy potwierdzenie zamówienia)',
     recipientSelf: 'To zamówienie dla mnie (odbiorca = zamawiający)',
     recipientHeading: 'Dane odbiorcy',
     recipientName: 'Imię i nazwisko odbiorcy',
@@ -26,10 +28,11 @@ const content = {
     date: 'Data', time: 'Godzina',
     paymentLabel: 'Sposób płatności',
     paymentBlik: 'BLIK',
-    paymentCash: 'Gotówka',
+    paymentCash: 'Gotówka lub karta w pracowni (tylko odbiór osobisty)',
     comment: 'Komentarz (opcjonalnie)',
-    consent: 'Wyrażam zgodę na przetwarzanie moich danych osobowych w celu realizacji zamówienia (zgodnie z RODO).',
-    submit: 'Złóż zamówienie', sending: 'Wysyłanie...',
+    acceptPre: 'Oświadczam, że zapoznałem/am się z ', acceptLink: 'Regulaminem sklepu', acceptPost: ' i akceptuję jego postanowienia.',
+    privacyPre: `Administratorem Twoich danych osobowych jest ${COMPANY.name}. Dane przetwarzamy w celu realizacji zamówienia. Szczegóły: `, privacyLink: 'Polityka prywatności', privacyPost: '.',
+    submit: 'Zamawiam i płacę', sending: 'Wysyłanie...',
     success: 'Dziękujemy! Twoje zamówienie zostało wysłane.',
     error: 'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas na Instagramie.',
   },
@@ -39,6 +42,7 @@ const content = {
     buyerHeading: 'Данные заказчика',
     buyerName: 'Имя и фамилия',
     buyerPhone: 'Телефон',
+    buyerEmail: 'E-mail (пришлём подтверждение заказа)',
     recipientSelf: 'Этот заказ для меня (получатель = заказчик)',
     recipientHeading: 'Данные получателя',
     recipientName: 'Имя и фамилия получателя',
@@ -52,10 +56,11 @@ const content = {
     date: 'Дата', time: 'Время',
     paymentLabel: 'Способ оплаты',
     paymentBlik: 'BLIK',
-    paymentCash: 'Наличными',
+    paymentCash: 'Наличные или карта в студии (только самовывоз)',
     comment: 'Комментарий (необязательно)',
-    consent: 'Я даю согласие на обработку моих персональных данных для оформления заказа (в соответствии с RODO/GDPR).',
-    submit: 'Оформить заказ', sending: 'Отправка...',
+    acceptPre: 'Заявляю, что ознакомлен(а) с ', acceptLink: 'Правилами магазина (Regulamin)', acceptPost: ' и принимаю их.',
+    privacyPre: `Администратор ваших персональных данных — ${COMPANY.name}. Мы обрабатываем данные для выполнения заказа. Подробнее: `, privacyLink: 'Политика конфиденциальности', privacyPost: '.',
+    submit: 'Заказать с обязательством оплаты', sending: 'Отправка...',
     success: 'Спасибо! Ваш заказ отправлен.',
     error: 'Что-то пошло не так. Попробуйте ещё раз или напишите нам в Instagram.',
   },
@@ -65,6 +70,7 @@ const content = {
     buyerHeading: "Orderer's details",
     buyerName: 'Full name',
     buyerPhone: 'Phone',
+    buyerEmail: 'E-mail (we will send the order confirmation)',
     recipientSelf: 'This order is for me (recipient = orderer)',
     recipientHeading: "Recipient's details",
     recipientName: "Recipient's full name",
@@ -78,16 +84,19 @@ const content = {
     date: 'Date', time: 'Time',
     paymentLabel: 'Payment method',
     paymentBlik: 'BLIK',
-    paymentCash: 'Cash',
+    paymentCash: 'Cash or card at the studio (pickup only)',
     comment: 'Comment (optional)',
-    consent: 'I agree to the processing of my personal data for the purpose of order fulfillment (in accordance with GDPR).',
-    submit: 'Place order', sending: 'Sending...',
+    acceptPre: 'I declare that I have read and accept the ', acceptLink: 'Terms and Conditions (Regulamin)', acceptPost: '.',
+    privacyPre: `The controller of your personal data is ${COMPANY.name}. We process your data to fulfil your order. Details: `, privacyLink: 'Privacy Policy', privacyPost: '.',
+    submit: 'Order with obligation to pay', sending: 'Sending...',
     success: 'Thank you! Your order has been sent.',
     error: 'Something went wrong. Please try again or message us on Instagram.',
   },
 };
 const t = content[currentLocale] ?? content.pl;
 const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
+const regulaminUrl = getRelativeLocaleUrl(currentLocale, '/regulamin');
+const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
 ---
 
 <section class="cart-section">
@@ -112,6 +121,11 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
         <input type="tel" name="buyerPhone" id="buyer-phone-input" required />
       </label>
     </div>
+
+    <label>
+      {t.buyerEmail}
+      <input type="email" name="buyerEmail" id="buyer-email-input" autocomplete="email" required />
+    </label>
 
     <label class="order-form-checkbox">
       <input type="checkbox" name="recipientIsMe" id="recipient-is-me" />
@@ -176,7 +190,7 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
           <input type="radio" name="payment" value="blik" checked />
           {t.paymentBlik}
         </label>
-        <label class="toggle-option">
+        <label class="toggle-option" id="payment-cash-option" style="display:none;">
           <input type="radio" name="payment" value="cash" />
           {t.paymentCash}
         </label>
@@ -189,9 +203,13 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
     </label>
 
     <label class="order-form-checkbox">
-      <input type="checkbox" name="consent" required />
-      <span>{t.consent}</span>
+      <input type="checkbox" name="acceptRegulamin" required />
+      <span>{t.acceptPre}<a href={regulaminUrl} target="_blank" rel="noopener" class="legal-link">{t.acceptLink}</a>{t.acceptPost}</span>
     </label>
+
+    <p class="privacy-info">
+      {t.privacyPre}<a href={privacyUrl} target="_blank" rel="noopener" class="legal-link">{t.privacyLink}</a>{t.privacyPost}
+    </p>
 
     <button type="submit" id="order-submit-btn">{t.submit}</button>
     <p id="order-status-msg" class="order-status-msg"></p>
@@ -206,6 +224,17 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
   .delivery-info-note a {
     color: var(--color-accent);
     text-decoration: underline;
+  }
+
+  .legal-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .privacy-info {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin: 4px 0 16px;
   }
 </style>
 
@@ -313,6 +342,22 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
           addressField.style.display = isPickup ? 'none' : '';
           addressInput.required = !isPickup;
           pickupNote.style.display = isPickup ? 'block' : 'none';
+
+          // Оплата в студии (наличные/карта) — только при самовывозе
+          const cashOption = document.getElementById('payment-cash-option');
+          if (cashOption) {
+            cashOption.style.display = isPickup ? '' : 'none';
+            const cashInput = cashOption.querySelector('input');
+            if (!isPickup && cashInput && cashInput.checked) {
+              const paymentGroup = cashOption.closest('.toggle-group');
+              const blikOption = paymentGroup ? paymentGroup.querySelector('input[value="blik"]') : null;
+              if (blikOption) {
+                paymentGroup.querySelectorAll('.toggle-option').forEach((o) => o.classList.remove('active'));
+                blikOption.checked = true;
+                blikOption.closest('.toggle-option').classList.add('active');
+              }
+            }
+          }
         }
       });
     });
@@ -333,6 +378,7 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
       const isSelf = formData.get('recipientIsMe') === 'on';
       const buyerName = formData.get('buyerName');
       const buyerPhone = formData.get('buyerPhone');
+      const buyerEmail = formData.get('buyerEmail');
       const recipientName = isSelf ? buyerName : formData.get('recipientName');
       const recipientPhone = isSelf ? buyerPhone : formData.get('recipientPhone');
 
@@ -345,7 +391,7 @@ const deliveryPageUrl = getRelativeLocaleUrl(currentLocale, '/delivery');
       const payment = formData.get('payment');
       const paymentLabel = payment === 'blik' ? paymentBlikLabel : paymentCashLabel;
 
-      const text = `🌸 Новый заказ (Charmel Flowers)\n\n${itemsText}\n\nИтого: ${total} zł\n\n— Заказчик —\nИмя: ${buyerName}\nТелефон: ${buyerPhone}\n\n— Получатель —\nИмя: ${recipientName}\nТелефон: ${recipientPhone}\n\nСпособ получения: ${fulfillmentLabel}\n${addressLine}\n\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nОплата: ${paymentLabel}\nКомментарий: ${formData.get('comment') || '—'}\nСогласие на обработку данных: получено`;
+      const text = `🌸 Новый заказ (Charmel Flowers)\n\n${itemsText}\n\nИтого: ${total} zł\n\n— Заказчик —\nИмя: ${buyerName}\nТелефон: ${buyerPhone}\nE-mail: ${buyerEmail}\n\n— Получатель —\nИмя: ${recipientName}\nТелефон: ${recipientPhone}\n\nСпособ получения: ${fulfillmentLabel}\n${addressLine}\n\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nОплата: ${paymentLabel}\nКомментарий: ${formData.get('comment') || '—'}\nRegulamin принят: да`;
 
       submitBtn.disabled = true;
       submitBtn.textContent = sendingLabel;

@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import LegalPage from '../../components/LegalPage.astro';
+import { REGULAMIN } from '../../data/regulamin';
+
+const title = 'Правила магазина (Regulamin) | Charmel Flowers';
+const description = 'Правила интернет-магазина Charmel Flowers: заказы, оплата, доставка, отказ от договора и рекламации.';
+---
+
+<Layout title={title} description={description}>
+  <LegalPage doc={REGULAMIN.ru} />
+</Layout>

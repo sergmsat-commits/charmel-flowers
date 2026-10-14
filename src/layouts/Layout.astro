@@ -1,6 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import '../styles/global.css';
+import { COMPANY } from '../data/company';
 
 interface Props {
   title?: string;
@@ -78,6 +79,13 @@ const footer = {
   },
 };
 const f = footer[currentLocale] ?? footer.pl;
+
+const legalLinks = {
+  pl: { regulamin: 'Regulamin', privacy: 'Polityka prywatności' },
+  ru: { regulamin: 'Правила магазина (Regulamin)', privacy: 'Политика конфиденциальности' },
+  en: { regulamin: 'Terms (Regulamin)', privacy: 'Privacy Policy' },
+};
+const lg = legalLinks[currentLocale] ?? legalLinks.pl;
 
 const widgetLabels = {
   pl: { open: 'Skontaktuj się z nami', close: 'Zamknij', whatsapp: 'Napisz na WhatsApp', telegram: 'Napisz na Telegram', instagram: 'Instagram', call: 'Zadzwoń' },
@@ -292,6 +300,7 @@ const businessSchema = {
         <h4>{nav.contact}</h4>
         <p class="footer-contact">Stryjeńskich 6/lok.UH1B, 02-791 Warszawa</p>
         <a href="tel:+48514011410" class="footer-phone">+48 514 011 410</a>
+        <a href={`mailto:${COMPANY.email}`} class="footer-email">{COMPANY.email}</a>
         <div class="footer-social">
           <a href="https://www.instagram.com/charmelflowers/" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
           <a href="https://wa.me/48514011410" target="_blank" rel="noopener" aria-label="WhatsApp">WhatsApp</a>
@@ -311,6 +320,15 @@ const businessSchema = {
     <div class="footer-bottom">
       <p>&copy; 2026 Charmel Flowers</p>
       <p class="footer-rights">{f.rights}</p>
+    </div>
+
+    <div class="footer-legal-row">
+      <p class="footer-legal">
+        <a href={getRelativeLocaleUrl(currentLocale, '/regulamin')}>{lg.regulamin}</a>
+        <span aria-hidden="true"> · </span>
+        <a href={getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci')}>{lg.privacy}</a>
+      </p>
+      <p class="footer-company">{COMPANY.name} · NIP {COMPANY.nip} · REGON {COMPANY.regon}</p>
     </div>
   </footer>
 
@@ -497,6 +515,28 @@ const businessSchema = {
     }
     @media (prefers-reduced-motion: reduce) {
       .cw-icon, .cw-panel, .cw-toggle, .cw-item, .cw-close { transition: none; }
+    }
+
+    /* Подвал: e-mail, ссылки на Regulamin / Politykę и реквизиты */
+    .footer-email {
+      display: block;
+      margin-top: 4px;
+      color: inherit;
+      word-break: break-word;
+    }
+    .footer-legal-row {
+      text-align: center;
+      padding: 10px 16px 16px;
+    }
+    .footer-legal,
+    .footer-company {
+      font-size: 0.82rem;
+      opacity: 0.85;
+      margin: 4px 0 0;
+    }
+    .footer-legal a {
+      color: inherit;
+      text-decoration: underline;
     }
   </style>
 </body>
