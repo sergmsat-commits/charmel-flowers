@@ -43,6 +43,10 @@ composition:
   - "nigella"
 sections:
   - "author"
+seo:
+  pl: "Bukiet „Morska bryza” w błękitnej tonacji: hortensja, białe róże i ażurowa nigella. Elegancki prezent z podziękowaniem lub życzeniami – dostawa w Warszawie."
+  ru: "Букет «Морской бриз» в небесно-голубой гамме: гортензия, белые розы и ажурная нигелла. Элегантный подарок с благодарностью или поздравлением — доставка по Варшаве."
+  en: "Sea Breeze bouquet in sky-blue tones: hydrangea, white roses and delicate nigella. An elegant thank-you or congratulations gift – delivery in Warsaw."
 cover: "hydrangea-02.jpg"
 gallery:
   - "hydrangea-02-1.jpg"

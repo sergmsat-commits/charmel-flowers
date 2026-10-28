@@ -45,6 +45,10 @@ featured: true
 sections:
   - "mono"
   - "roses"
+seo:
+  pl: "Bukiet „Francuski pocałunek” – monobukiet z piwoniowych róż w brzoskwiniowo-różowym kolorze. Romantyczny prezent na randkę i rocznicę – dostawa w Warszawie."
+  ru: "Букет «Французский поцелуй» — монобукет из пионовидных роз персиково-розового цвета. Романтичный подарок на свидание или годовщину — доставка по Варшаве."
+  en: "French Kiss – a mono-bouquet of peach-pink peony-style garden roses. A romantic gift for a date or anniversary – flower delivery in Warsaw."
 cover: "rose-01.jpg"
 gallery:
   - "rose-01-1.jpg"

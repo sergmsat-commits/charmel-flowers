@@ -43,6 +43,10 @@ composition:
   - "nigella"
 sections:
   - "author"
+seo:
+  pl: "Bukiet „Perłowy blask” w pastelach: biała hortensja, różowe dalie i nigella. Subtelny prezent na ślub, urodziny lub wyznanie uczuć – dostawa w Warszawie."
+  ru: "Букет «Перламутр» в пастельных тонах: белая гортензия, розовые георгины и нигелла. Нежный подарок на свадьбу, день рождения или признание — доставка по Варшаве."
+  en: "Pearl bouquet in pastel tones: white hydrangea, pink dahlias and nigella. A delicate gift for a wedding, birthday or declaration of love – delivery in Warsaw."
 cover: "hydrangea-04.jpg"
 gallery:
   - "hydrangea-04-1.jpg"

@@ -36,7 +36,12 @@ variants:
 composition:
   - "limonium"
 sections:
-  - "dried"
+  - "wreaths"
+handmade: true
+seo:
+  pl: "Wieniec „Stepowy wiatr” z naturalnej rafii, fioletowego limonium i suszonych kwiatów. Ręcznie robiona dekoracja drzwi i wnętrz w stylu boho – Charmel Flowers."
+  ru: "Венок «Степной ветер» из натуральной рафии, фиолетового лимониума и сухоцветов. Декор ручной работы для двери и интерьера в стиле бохо — Charmel Flowers, Варшава."
+  en: "Steppe Wind wreath of natural raffia, purple limonium and dried flowers. A handmade boho decoration for your door or interior – Charmel Flowers, Warsaw."
 cover: "wreath-01.jpg"
 gallery:
   - "wreath-01-1.jpg"

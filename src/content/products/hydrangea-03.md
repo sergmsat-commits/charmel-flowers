@@ -43,6 +43,10 @@ composition:
   - "hydrangea"
 sections:
   - "mono"
+seo:
+  pl: "Bukiet „Różowa chmurka” – bujny monobukiet z delikatnie różowej hortensji. Efektowny prezent na urodziny lub wyznanie uczuć – dostawa kwiatów w Warszawie."
+  ru: "Букет «Розовое облако» — пышный монобукет из нежно-розовой гортензии. Эффектный подарок на день рождения или для признания в чувствах — доставка по Варшаве."
+  en: "Pink Cloud – a lush mono-bouquet of soft pink hydrangea. A striking gift for a birthday or a romantic gesture – flower delivery in Warsaw."
 cover: "hydrangea-03.jpg"
 gallery:
   - "hydrangea-03-1.jpg"

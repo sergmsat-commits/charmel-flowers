@@ -47,6 +47,10 @@ composition:
 featured: true
 sections:
   - "author"
+seo:
+  pl: "Bukiet „Niebiańska hortensja” z błękitną hortensją, eustomą, różą i eukaliptusem. Zwiewny prezent na urodziny lub randkę – dostawa kwiatów w Warszawie."
+  ru: "Букет «Небесная гортензия» с голубой гортензией, эустомой, розой и эвкалиптом. Воздушный подарок на день рождения или свидание — доставка цветов по Варшаве."
+  en: "Heavenly Hydrangea bouquet with blue hydrangea, eustoma, rose and eucalyptus. An airy gift for a birthday or a date – flower delivery in Warsaw."
 cover: "hydrangea-01.jpg"
 gallery:
   - "hydrangea-01-1.jpg"

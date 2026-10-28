@@ -39,6 +39,15 @@ const products = defineCollection({
     // Разделы каталога (Моно/дуо, Сухоцветы, Авторский, Розы). Букет может быть в нескольких.
     sections: z.array(z.enum(SECTION_SLUGS)).optional().default([]),
     featured: z.boolean().optional().default(false),
+    // SEO-описание для Google (meta description). Необязательное: если его нет,
+    // берётся начало первого абзаца описания. Оптимально 120–160 символов.
+    seo: z
+      .object({
+        pl: z.string().optional(),
+        ru: z.string().optional(),
+        en: z.string().optional(),
+      })
+      .optional(),
     composition: z.array(z.enum(FLOWER_SPECIES_SLUGS)).optional().default([]),
   }),
 });

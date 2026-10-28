@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import ProductDetail from '../../../components/ProductDetail.astro';
+import { productMetaDescription } from '../../../data/seo';
 
 export async function getStaticPaths() {
   const products = await getCollection('products');
@@ -14,7 +15,7 @@ export async function getStaticPaths() {
 const { product } = Astro.props;
 const currentLocale = Astro.currentLocale ?? 'pl';
 const pageTitle = `${product.data.title[currentLocale]} | Charmel Flowers`;
-const pageDescription = product.data.description[currentLocale];
+const pageDescription = productMetaDescription(product, currentLocale);
 ---
 <Layout title={pageTitle} description={pageDescription}>
   <ProductDetail product={product} />

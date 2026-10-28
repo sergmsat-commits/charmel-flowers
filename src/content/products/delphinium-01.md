@@ -44,6 +44,10 @@ composition:
   - "panicum"
 sections:
   - "author"
+seo:
+  pl: "Bukiet „Lawendowy zachód słońca”: pomarańczowe dalie, fioletowy delfinium, eustoma i panicum. Kontrastowa kompozycja w ogrodowym stylu – dostawa w Warszawie."
+  ru: "Букет «Лавандовый закат»: оранжевые георгины, фиолетовый дельфиниум, эустома и паникум. Яркая композиция в садовом стиле — доставка цветов по Варшаве."
+  en: "Lavender Sunset bouquet: orange dahlias, purple delphinium, eustoma and panicum. A bold garden-style arrangement – flower delivery in Warsaw."
 cover: "delphinium-01.jpg"
 gallery:
   - "delphinium-01-1.jpg"
