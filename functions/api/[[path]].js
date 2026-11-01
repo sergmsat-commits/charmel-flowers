@@ -316,8 +316,16 @@ async function handlePing(env) {
   const telegramOk = Boolean(tgToken(env) && tgChat(env));
   if (!cfg) return json({ p24: 'not-configured', telegram: telegramOk ? 'configured' : 'not-configured' });
   const r = await p24Request(cfg, 'GET', 'api/v1/testAccess');
+  // С какого IP Cloudflare ходит в интернет (P24 пускает в API только с разрешённых IP)
+  let egressIp = 'unknown';
+  try {
+    egressIp = (await (await fetch('https://api.ipify.org')).text()).trim().slice(0, 64);
+  } catch {
+    egressIp = 'unknown';
+  }
   return json({
     p24: r.ok && r.data?.data === true ? 'ok' : `error (HTTP ${r.status})`,
+    egressIp,
     server: cfg.base.includes('sandbox') ? 'sandbox' : 'live',
     merchantId: cfg.merchantId,
     posId: cfg.posId,
