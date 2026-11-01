@@ -4,8 +4,8 @@ import { COMPANY } from '../data/company';
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 
-const botToken = import.meta.env.PUBLIC_TELEGRAM_BOT_TOKEN ?? '';
-const chatId = import.meta.env.PUBLIC_TELEGRAM_CHAT_ID ?? '';
+// Заказ отправляется на сервер (/api/order, папка functions/), а не напрямую в Telegram:
+// токен бота и ключи Przelewy24 хранятся только в переменных Cloudflare.
 
 const content = {
   pl: {
@@ -27,14 +27,16 @@ const content = {
     pickupNote: 'Odbiór pod adresem: Stryjeńskich 6/lok.UH1B, Kabaty',
     date: 'Data', time: 'Godzina',
     paymentLabel: 'Sposób płatności',
-    paymentBlik: 'BLIK',
+    paymentOnline: 'Płatność online (BLIK, karta, przelew)',
     paymentCash: 'Gotówka lub karta w pracowni (tylko odbiór osobisty)',
+    deliveryCostNote: 'Koszt dostawy (Uber/Wolt) zależy od adresu — potwierdzimy go po złożeniu zamówienia.',
     comment: 'Komentarz (opcjonalnie)',
     acceptPre: 'Oświadczam, że zapoznałem/am się z ', acceptLink: 'Regulaminem sklepu', acceptPost: ' i akceptuję jego postanowienia.',
     privacyPre: `Administratorem Twoich danych osobowych jest ${COMPANY.name}. Dane przetwarzamy w celu realizacji zamówienia. Szczegóły: `, privacyLink: 'Polityka prywatności', privacyPost: '.',
     submit: 'Zamawiam i płacę', sending: 'Wysyłanie...',
-    success: 'Dziękujemy! Twoje zamówienie zostało wysłane.',
-    error: 'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas na Instagramie.',
+    success: 'Dziękujemy! Twoje zamówienie zostało przyjęte. Wkrótce się z Tobą skontaktujemy.',
+    redirecting: 'Przekierowujemy do płatności Przelewy24…',
+    error: 'Coś poszło nie tak. Spróbuj ponownie lub zadzwoń do nas: +48 514 011 410.',
   },
   ru: {
     title: 'Корзина', empty: 'Ваша корзина пуста.', remove: 'Удалить', total: 'Итого',
@@ -55,14 +57,16 @@ const content = {
     pickupNote: 'Самовывоз по адресу: Stryjeńskich 6/lok.UH1B, Кабаты',
     date: 'Дата', time: 'Время',
     paymentLabel: 'Способ оплаты',
-    paymentBlik: 'BLIK',
+    paymentOnline: 'Онлайн-оплата (BLIK, карта, перевод)',
     paymentCash: 'Наличные или карта в студии (только самовывоз)',
+    deliveryCostNote: 'Стоимость доставки (Uber/Wolt) зависит от адреса — мы подтвердим её после оформления заказа.',
     comment: 'Комментарий (необязательно)',
     acceptPre: 'Заявляю, что ознакомлен(а) с ', acceptLink: 'Правилами магазина (Regulamin)', acceptPost: ' и принимаю их.',
     privacyPre: `Администратор ваших персональных данных — ${COMPANY.name}. Мы обрабатываем данные для выполнения заказа. Подробнее: `, privacyLink: 'Политика конфиденциальности', privacyPost: '.',
     submit: 'Заказать с обязательством оплаты', sending: 'Отправка...',
-    success: 'Спасибо! Ваш заказ отправлен.',
-    error: 'Что-то пошло не так. Попробуйте ещё раз или напишите нам в Instagram.',
+    success: 'Спасибо! Ваш заказ принят. Мы скоро свяжемся с вами.',
+    redirecting: 'Переходим к оплате Przelewy24…',
+    error: 'Что-то пошло не так. Попробуйте ещё раз или позвоните нам: +48 514 011 410.',
   },
   en: {
     title: 'Cart', empty: 'Your cart is empty.', remove: 'Remove', total: 'Total',
@@ -83,14 +87,16 @@ const content = {
     pickupNote: 'Pickup at: Stryjeńskich 6/lok.UH1B, Kabaty',
     date: 'Date', time: 'Time',
     paymentLabel: 'Payment method',
-    paymentBlik: 'BLIK',
+    paymentOnline: 'Pay online (BLIK, card, bank transfer)',
     paymentCash: 'Cash or card at the studio (pickup only)',
+    deliveryCostNote: 'Delivery cost (Uber/Wolt) depends on the address — we will confirm it after you place the order.',
     comment: 'Comment (optional)',
     acceptPre: 'I declare that I have read and accept the ', acceptLink: 'Terms and Conditions (Regulamin)', acceptPost: '.',
     privacyPre: `The controller of your personal data is ${COMPANY.name}. We process your data to fulfil your order. Details: `, privacyLink: 'Privacy Policy', privacyPost: '.',
     submit: 'Order with obligation to pay', sending: 'Sending...',
-    success: 'Thank you! Your order has been sent.',
-    error: 'Something went wrong. Please try again or message us on Instagram.',
+    success: 'Thank you! Your order has been received. We will contact you shortly.',
+    redirecting: 'Redirecting to Przelewy24 payment…',
+    error: 'Something went wrong. Please try again or call us: +48 514 011 410.',
   },
 };
 const t = content[currentLocale] ?? content.pl;
@@ -106,6 +112,7 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
   <div class="cart-total">
     <strong>{t.total}: <span id="cart-total-value">0</span> zł</strong>
   </div>
+  <p class="delivery-cost-note" id="delivery-cost-note">{t.deliveryCostNote}</p>
 
   <form id="order-form" class="order-form">
     <h2>{t.formTitle}</h2>
@@ -187,8 +194,8 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
       <span class="field-label">{t.paymentLabel}</span>
       <div class="toggle-group" data-group="payment">
         <label class="toggle-option active">
-          <input type="radio" name="payment" value="blik" checked />
-          {t.paymentBlik}
+          <input type="radio" name="payment" value="online" checked />
+          {t.paymentOnline}
         </label>
         <label class="toggle-option" id="payment-cash-option" style="display:none;">
           <input type="radio" name="payment" value="cash" />
@@ -231,6 +238,12 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
     text-decoration: underline;
   }
 
+  .delivery-cost-note {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin: -4px 0 16px;
+  }
+
   .privacy-info {
     font-size: 0.85rem;
     opacity: 0.85;
@@ -238,9 +251,7 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
   }
 </style>
 
-<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error, paymentBlikLabel: t.paymentBlik, paymentCashLabel: t.paymentCash, pickupNoteText: t.pickupNote, botToken, chatId }}>
-  const BOT_TOKEN = botToken;
-  const CHAT_ID = chatId;
+<script define:vars={{ removeLabel: t.remove, sendingLabel: t.sending, submitLabel: t.submit, successMsg: t.success, errorMsg: t.error, redirectingMsg: t.redirecting, locale: currentLocale }}>
 
   function renderCart() {
     if (!window.AuraCart) return;
@@ -343,6 +354,9 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
           addressInput.required = !isPickup;
           pickupNote.style.display = isPickup ? 'block' : 'none';
 
+          const deliveryCostNote = document.getElementById('delivery-cost-note');
+          if (deliveryCostNote) deliveryCostNote.style.display = isPickup ? 'none' : '';
+
           // Оплата в студии (наличные/карта) — только при самовывозе
           const cashOption = document.getElementById('payment-cash-option');
           if (cashOption) {
@@ -350,7 +364,7 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
             const cashInput = cashOption.querySelector('input');
             if (!isPickup && cashInput && cashInput.checked) {
               const paymentGroup = cashOption.closest('.toggle-group');
-              const blikOption = paymentGroup ? paymentGroup.querySelector('input[value="blik"]') : null;
+              const blikOption = paymentGroup ? paymentGroup.querySelector('input[value="online"]') : null;
               if (blikOption) {
                 paymentGroup.querySelectorAll('.toggle-option').forEach((o) => o.classList.remove('active'));
                 blikOption.checked = true;
@@ -363,6 +377,15 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
     });
   });
 
+  // Если покупатель вернулся из Przelewy24 кнопкой «Назад» — снова включаем кнопку заказа
+  window.addEventListener('pageshow', () => {
+    const btn = document.getElementById('order-submit-btn');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = submitLabel;
+    }
+  });
+
   const orderForm = document.getElementById('order-form');
   if (orderForm) {
     orderForm.addEventListener('submit', async (e) => {
@@ -372,47 +395,56 @@ const privacyUrl = getRelativeLocaleUrl(currentLocale, '/polityka-prywatnosci');
       const formData = new FormData(orderForm);
       const cart = window.AuraCart.getCart();
 
-      const itemsText = cart.map((i) => `- ${i.title} x${i.qty} — ${i.price * i.qty} zł`).join('\n');
-      const total = window.AuraCart.getTotal();
-
       const isSelf = formData.get('recipientIsMe') === 'on';
-      const buyerName = formData.get('buyerName');
-      const buyerPhone = formData.get('buyerPhone');
-      const buyerEmail = formData.get('buyerEmail');
-      const recipientName = isSelf ? buyerName : formData.get('recipientName');
-      const recipientPhone = isSelf ? buyerPhone : formData.get('recipientPhone');
-
-      const fulfillment = formData.get('fulfillment');
-      const fulfillmentLabel = fulfillment === 'pickup' ? 'Самовывоз (Кабаты)' : 'Доставка';
-      const addressLine = fulfillment === 'pickup'
-        ? pickupNoteText
-        : `Адрес доставки: ${formData.get('recipientAddress')}`;
-
-      const payment = formData.get('payment');
-      const paymentLabel = payment === 'blik' ? paymentBlikLabel : paymentCashLabel;
-
-      const text = `🌸 Новый заказ (Charmel Flowers)\n\n${itemsText}\n\nИтого: ${total} zł\n\n— Заказчик —\nИмя: ${buyerName}\nТелефон: ${buyerPhone}\nE-mail: ${buyerEmail}\n\n— Получатель —\nИмя: ${recipientName}\nТелефон: ${recipientPhone}\n\nСпособ получения: ${fulfillmentLabel}\n${addressLine}\n\nДата: ${formData.get('date')}\nВремя: ${formData.get('time')}\nОплата: ${paymentLabel}\nКомментарий: ${formData.get('comment') || '—'}\nRegulamin принят: да`;
+      const fulfillment = formData.get('fulfillment') === 'pickup' ? 'pickup' : 'delivery';
+      const payload = {
+        locale,
+        items: cart.map((i) => ({ id: i.id, qty: i.qty })),
+        buyerName: formData.get('buyerName'),
+        buyerPhone: formData.get('buyerPhone'),
+        buyerEmail: formData.get('buyerEmail'),
+        recipientName: isSelf ? '' : formData.get('recipientName'),
+        recipientPhone: isSelf ? '' : formData.get('recipientPhone'),
+        fulfillment,
+        address: fulfillment === 'delivery' ? formData.get('recipientAddress') : '',
+        date: formData.get('date'),
+        time: formData.get('time'),
+        payment: formData.get('payment') === 'cash' ? 'cash' : 'online',
+        comment: formData.get('comment') || '',
+        acceptRegulamin: formData.get('acceptRegulamin') === 'on',
+      };
 
       submitBtn.disabled = true;
       submitBtn.textContent = sendingLabel;
       statusMsg.textContent = '';
+      statusMsg.className = 'order-status-msg';
 
       try {
-        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        const res = await fetch('/api/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text }),
+          body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error('Telegram API error');
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || 'order-failed');
+
+        if (data.mode === 'online' && data.redirectUrl) {
+          // Корзину очищаем только после подтверждённой оплаты (страница «Спасибо»)
+          statusMsg.textContent = redirectingMsg;
+          statusMsg.className = 'order-status-msg success';
+          window.location.href = data.redirectUrl;
+          return;
+        }
 
         statusMsg.textContent = successMsg;
         statusMsg.className = 'order-status-msg success';
         window.AuraCart.clearCart();
         orderForm.reset();
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitLabel;
       } catch (err) {
         statusMsg.textContent = errorMsg;
         statusMsg.className = 'order-status-msg error';
-      } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = submitLabel;
       }

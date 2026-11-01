@@ -1,0 +1,124 @@
+---
+// Страница, на которую Przelewy24 возвращает покупателя после оплаты.
+// Спрашивает у сервера (/api/p24/status) статус платежа и показывает результат.
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+const currentLocale = Astro.currentLocale ?? 'pl';
+
+const content = {
+  pl: {
+    title: 'Status zamówienia',
+    checking: 'Sprawdzamy status płatności…',
+    paid: 'Dziękujemy! Płatność została przyjęta, a zamówienie przekazaliśmy florystom. Wkrótce się z Tobą skontaktujemy.',
+    pending: 'Nie otrzymaliśmy jeszcze potwierdzenia płatności. Jeśli zapłaciłeś(-aś), potwierdzenie może dotrzeć za kilka minut — skontaktujemy się z Tobą. Jeśli płatność została przerwana, możesz spróbować ponownie z koszyka.',
+    returned: 'Płatność została zwrócona. W razie pytań zadzwoń do nas.',
+    unknown: 'Nie udało się sprawdzić statusu płatności. Jeśli zapłaciłeś(-aś), skontaktujemy się z Tobą. W razie pytań zadzwoń: +48 514 011 410.',
+    toCart: 'Wróć do koszyka',
+    toHome: 'Strona główna',
+  },
+  ru: {
+    title: 'Статус заказа',
+    checking: 'Проверяем статус оплаты…',
+    paid: 'Спасибо! Оплата получена, заказ передан флористам. Мы скоро свяжемся с вами.',
+    pending: 'Подтверждение оплаты ещё не пришло. Если вы оплатили, оно может прийти в течение нескольких минут — мы с вами свяжемся. Если оплата была прервана, можно попробовать снова из корзины.',
+    returned: 'Платёж был возвращён. Если есть вопросы, позвоните нам.',
+    unknown: 'Не удалось проверить статус оплаты. Если вы оплатили, мы с вами свяжемся. Вопросы — по телефону +48 514 011 410.',
+    toCart: 'Вернуться в корзину',
+    toHome: 'На главную',
+  },
+  en: {
+    title: 'Order status',
+    checking: 'Checking your payment status…',
+    paid: 'Thank you! Your payment has been received and your order has been passed to our florists. We will contact you shortly.',
+    pending: "We haven't received payment confirmation yet. If you have paid, it may arrive within a few minutes — we will contact you. If the payment was interrupted, you can try again from your cart.",
+    returned: 'The payment has been refunded. If you have any questions, please call us.',
+    unknown: "We couldn't check the payment status. If you have paid, we will contact you. Questions: +48 514 011 410.",
+    toCart: 'Back to cart',
+    toHome: 'Home page',
+  },
+};
+const t = content[currentLocale] ?? content.pl;
+const cartUrl = getRelativeLocaleUrl(currentLocale, '/cart');
+const homeUrl = getRelativeLocaleUrl(currentLocale, '/');
+---
+
+<section class="order-status-page">
+  <h1>{t.title}</h1>
+  <p id="order-status-text" class="order-status-text">{t.checking}</p>
+  <p class="order-status-links">
+    <a id="order-status-cart" href={cartUrl} style="display:none;">{t.toCart}</a>
+    <a href={homeUrl}>{t.toHome}</a>
+  </p>
+</section>
+
+<style>
+  .order-status-page {
+    max-width: 640px;
+    margin: 40px auto;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .order-status-page h1 {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+  }
+
+  .order-status-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 20px 0 28px;
+  }
+
+  .order-status-text.is-paid {
+    color: var(--color-accent);
+    font-weight: bold;
+  }
+
+  .order-status-links {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .order-status-links a {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+</style>
+
+<script define:vars={{ msgs: { paid: t.paid, pending: t.pending, returned: t.returned, unknown: t.unknown } }}>
+  const sessionId = new URLSearchParams(window.location.search).get('s') || '';
+  const textEl = document.getElementById('order-status-text');
+  const cartLink = document.getElementById('order-status-cart');
+  let attempts = 0;
+
+  function show(status) {
+    textEl.textContent = msgs[status] || msgs.unknown;
+    textEl.classList.toggle('is-paid', status === 'paid');
+    if (status === 'paid') {
+      // Оплата подтверждена — очищаем корзину
+      if (window.AuraCart) window.AuraCart.clearCart();
+      else window.addEventListener('load', () => window.AuraCart && window.AuraCart.clearCart());
+    }
+    if (status === 'pending' || status === 'unknown') cartLink.style.display = '';
+  }
+
+  async function check() {
+    attempts += 1;
+    try {
+      const res = await fetch(`/api/p24/status?s=${encodeURIComponent(sessionId)}`, { cache: 'no-store' });
+      const data = await res.json();
+      if (data.status === 'paid' || data.status === 'returned') return show(data.status);
+      if (attempts < 10) return setTimeout(check, 3000); // ждём до ~30 секунд
+      return show(data.status === 'pending' ? 'pending' : 'unknown');
+    } catch {
+      if (attempts < 10) return setTimeout(check, 3000);
+      return show('unknown');
+    }
+  }
+
+  if (sessionId) check();
+  else show('unknown');
+</script>
