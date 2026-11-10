@@ -50,7 +50,4 @@ seo:
   ru: "Букет «Тёплый август» с подсолнухом, ромашкой, белыми хризантемами и гвоздиками. Солнечный подарок, который поднимает настроение, — доставка цветов по Варшаве."
   en: "Warm August bouquet with a sunflower, chamomile, white chrysanthemums and carnations. A sunny gift that lifts the mood – flower delivery in Warsaw."
 cover: "sunflower-01.jpg"
-gallery:
-  - "sunflower-01-1.jpg"
-  - "sunflower-01-2.jpg"
 ---

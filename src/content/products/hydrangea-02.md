@@ -48,7 +48,4 @@ seo:
   ru: "Букет «Морской бриз» в небесно-голубой гамме: гортензия, белые розы и ажурная нигелла. Элегантный подарок с благодарностью или поздравлением — доставка по Варшаве."
   en: "Sea Breeze bouquet in sky-blue tones: hydrangea, white roses and delicate nigella. An elegant thank-you or congratulations gift – delivery in Warsaw."
 cover: "hydrangea-02.jpg"
-gallery:
-  - "hydrangea-02-1.jpg"
-  - "hydrangea-02-2.jpg"
 ---

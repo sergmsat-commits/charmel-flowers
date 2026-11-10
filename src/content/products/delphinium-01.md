@@ -49,7 +49,4 @@ seo:
   ru: "Букет «Лавандовый закат»: оранжевые георгины, фиолетовый дельфиниум, эустома и паникум. Яркая композиция в садовом стиле — доставка цветов по Варшаве."
   en: "Lavender Sunset bouquet: orange dahlias, purple delphinium, eustoma and panicum. A bold garden-style arrangement – flower delivery in Warsaw."
 cover: "delphinium-01.jpg"
-gallery:
-  - "delphinium-01-1.jpg"
-  - "delphinium-01-2.jpg"
 ---

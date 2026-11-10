@@ -47,7 +47,4 @@ seo:
   ru: "Букет «Апельсиновый сорбет» с яркими оранжевыми георгинами и нежной эустомой. Позитивный подарок на день рождения, поздравление или без повода — доставка по Варшаве."
   en: "Orange Sorbet bouquet with vivid orange dahlias and soft eustoma. A cheerful gift for a birthday, congratulations or just because – delivery in Warsaw."
 cover: "dahlia-01.jpg"
-gallery:
-  - "dahlia-01-1.jpg"
-  - "dahlia-01-2.jpg"
 ---

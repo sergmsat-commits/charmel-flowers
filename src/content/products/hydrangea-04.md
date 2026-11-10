@@ -48,7 +48,4 @@ seo:
   ru: "Букет «Перламутр» в пастельных тонах: белая гортензия, розовые георгины и нигелла. Нежный подарок на свадьбу, день рождения или признание — доставка по Варшаве."
   en: "Pearl bouquet in pastel tones: white hydrangea, pink dahlias and nigella. A delicate gift for a wedding, birthday or declaration of love – delivery in Warsaw."
 cover: "hydrangea-04.jpg"
-gallery:
-  - "hydrangea-04-1.jpg"
-  - "hydrangea-04-2.jpg"
 ---

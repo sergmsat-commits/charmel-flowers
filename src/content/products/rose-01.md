@@ -50,7 +50,4 @@ seo:
   ru: "Букет «Французский поцелуй» — монобукет из пионовидных роз персиково-розового цвета. Романтичный подарок на свидание или годовщину — доставка по Варшаве."
   en: "French Kiss – a mono-bouquet of peach-pink peony-style garden roses. A romantic gift for a date or anniversary – flower delivery in Warsaw."
 cover: "rose-01.jpg"
-gallery:
-  - "rose-01-1.jpg"
-  - "rose-01-2.jpg"
 ---

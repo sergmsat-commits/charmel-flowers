@@ -48,7 +48,4 @@ seo:
   ru: "Букет «Голубая акварель»: небесно-голубая гортензия и нежно-лимонные кустовые розы. Свежий, современный и пышный подарок на любой повод — доставка по Варшаве."
   en: "Blue Watercolour bouquet: sky-blue hydrangea with lemon spray roses. A fresh, modern and lush gift for any occasion – flower delivery in Warsaw."
 cover: "hydrangea-05.jpg"
-gallery:
-  - "hydrangea-05-1.jpg"
-  - "hydrangea-05-2.jpg"
 ---
