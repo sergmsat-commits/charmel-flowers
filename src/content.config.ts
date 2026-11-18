@@ -52,4 +52,20 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { products };
+// Блог: одна статья = папка с тремя файлами pl.md / ru.md / en.md.
+// Имя папки = адрес статьи, одинаковый на всех языках:
+// /blog/<папка>/, /ru/blog/<папка>/, /en/blog/<папка>/ (так работает переключатель языка).
+// Поле slug во frontmatter НЕ использовать — Astro превращает его в id, и языки затирают друг друга.
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    lang: z.enum(['pl', 'ru', 'en']),
+    title: z.string(),
+    description: z.string(), // анонс в списке статей + meta description для Google
+    date: z.coerce.date(),
+    cover: z.string().optional(), // путь от корня сайта, напр. /images/blog/....jpg
+    coverAlt: z.string().optional(),
+  }),
+});
+
+export const collections = { products, blog };

@@ -16,9 +16,9 @@ let pathWithoutLocale = Astro.url.pathname.replace(/^\/(ru|en)(?=\/|$)/, '');
 if (pathWithoutLocale === '') pathWithoutLocale = '/';
 
 const navLabels = {
-  pl: { home: 'Strona główna', catalog: 'Katalog', delivery: 'Dostawa i płatność', about: 'O nas', contact: 'Kontakt' },
-  ru: { home: 'Главная', catalog: 'Каталог', delivery: 'Доставка и оплата', about: 'О нас', contact: 'Контакты' },
-  en: { home: 'Home', catalog: 'Catalog', delivery: 'Delivery & Payment', about: 'About', contact: 'Contact' },
+  pl: { home: 'Strona główna', catalog: 'Katalog', delivery: 'Dostawa i płatność', about: 'O nas', blog: 'Blog', contact: 'Kontakt' },
+  ru: { home: 'Главная', catalog: 'Каталог', delivery: 'Доставка и оплата', about: 'О нас', blog: 'Блог', contact: 'Контакты' },
+  en: { home: 'Home', catalog: 'Catalog', delivery: 'Delivery & Payment', about: 'About', blog: 'Blog', contact: 'Contact' },
 };
 const nav = navLabels[currentLocale] ?? navLabels.pl;
 
@@ -86,6 +86,14 @@ const legalLinks = {
   en: { regulamin: 'Terms (Regulamin)', privacy: 'Privacy Policy' },
 };
 const lg = legalLinks[currentLocale] ?? legalLinks.pl;
+
+// Подпись автора сайта (согласовано с владелицей магазина)
+const siteCredit = {
+  pl: { label: 'Strona:', href: 'https://satyrau.com/realizacje/charmel-flowers/' },
+  ru: { label: 'Сайт:', href: 'https://satyrau.com/ru/realizacje/charmel-flowers/' },
+  en: { label: 'Website by', href: 'https://satyrau.com/en/realizacje/charmel-flowers/' },
+};
+const credit = siteCredit[currentLocale] ?? siteCredit.pl;
 
 const widgetLabels = {
   pl: { open: 'Skontaktuj się z nami', close: 'Zamknij', whatsapp: 'Napisz na WhatsApp', telegram: 'Napisz na Telegram', instagram: 'Instagram', call: 'Zadzwoń' },
@@ -255,6 +263,7 @@ const businessSchema = {
           <a href={getRelativeLocaleUrl(currentLocale, '/catalog')}>{nav.catalog}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/delivery')}>{nav.delivery}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/about')}>{nav.about}</a>
+          <a href={getRelativeLocaleUrl(currentLocale, '/blog')}>{nav.blog}</a>
           <a href={getRelativeLocaleUrl(currentLocale, '/contact')}>{nav.contact}</a>
         </nav>
       </div>
@@ -320,6 +329,7 @@ const businessSchema = {
     <div class="footer-bottom">
       <p>&copy; 2026 Charmel Flowers</p>
       <p class="footer-rights">{f.rights}</p>
+      <p class="footer-credit">{credit.label} <a href={credit.href} target="_blank" rel="noopener">Siarhei Satyrau</a></p>
     </div>
 
     <div class="footer-legal-row">
@@ -537,6 +547,21 @@ const businessSchema = {
     .footer-legal a {
       color: inherit;
       text-decoration: underline;
+    }
+
+    /* Подпись автора сайта: мелко, цветом копирайта, в одну строку */
+    .footer-credit {
+      font-size: inherit;
+      white-space: nowrap;
+    }
+    .footer-credit a {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: rgba(0, 0, 0, 0.25);
+      text-underline-offset: 2px;
+    }
+    .footer-credit a:hover {
+      text-decoration-color: currentColor;
     }
   </style>
 </body>

@@ -1,0 +1,112 @@
+---
+// Страница одной статьи блога.
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { getRelativeLocaleUrl } from 'astro:i18n';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const currentLocale = (Astro.currentLocale ?? 'pl') as 'pl' | 'ru' | 'en';
+const { Content } = await render(post);
+
+const t = {
+  pl: { back: '← Wszystkie artykuły' },
+  ru: { back: '← Все статьи' },
+  en: { back: '← All articles' },
+}[currentLocale];
+
+const dateLocale = { pl: 'pl-PL', ru: 'ru-RU', en: 'en-GB' }[currentLocale];
+const fmt = new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<article class="blog-post">
+  <a href={getRelativeLocaleUrl(currentLocale, '/blog')} class="blog-back">{t.back}</a>
+  <h1>{post.data.title}</h1>
+  <time datetime={post.data.date.toISOString().slice(0, 10)}>{fmt.format(post.data.date)}</time>
+  {post.data.cover && (
+    <img class="blog-cover" src={post.data.cover} alt={post.data.coverAlt ?? ''} width="1200" height="800" />
+  )}
+  <div class="blog-content">
+    <Content />
+  </div>
+  <a href={getRelativeLocaleUrl(currentLocale, '/blog')} class="blog-back blog-back-bottom">{t.back}</a>
+</article>
+
+<style>
+  .blog-post {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8px 16px 48px;
+    color: var(--color-text);
+    line-height: 1.7;
+    font-size: 1.02rem;
+  }
+  .blog-back {
+    display: inline-block;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+  .blog-back:hover {
+    text-decoration: underline;
+  }
+  .blog-back-bottom {
+    margin-top: 24px;
+  }
+  .blog-post h1 {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    line-height: 1.25;
+    margin: 0 0 6px;
+  }
+  .blog-post time {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-bottom: 20px;
+  }
+  .blog-cover {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 480px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .blog-content :global(h2) {
+    font-family: var(--font-heading);
+    color: var(--color-accent);
+    font-size: 1.3rem;
+    margin: 32px 0 12px;
+  }
+  .blog-content :global(p) {
+    margin: 0 0 14px;
+  }
+  .blog-content :global(ul),
+  .blog-content :global(ol) {
+    padding-left: 22px;
+    margin: 0 0 14px;
+  }
+  .blog-content :global(li) {
+    margin-bottom: 8px;
+  }
+  .blog-content :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  .blog-content :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-primary-dark);
+    margin: 32px 0 20px;
+  }
+  .blog-content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+</style>
