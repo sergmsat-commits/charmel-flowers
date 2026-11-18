@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import BlogPost from '../../../components/BlogPost.astro';
+import BlogHead from '../../../components/BlogHead.astro';
 
 // Адрес = имя папки статьи (src/content/blog/<папка>/). Только статьи на языке «ru»
 export async function getStaticPaths() {
@@ -16,6 +17,7 @@ const { post } = Astro.props;
 const title = `${post.data.title} | Charmel Flowers`;
 ---
 
-<Layout title={title} description={post.data.description}>
+<Layout title={title} description={post.data.description} image={post.data.cover} type="article">
+  <BlogHead slot="head" post={post} />
   <BlogPost post={post} />
 </Layout>

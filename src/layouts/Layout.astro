@@ -6,8 +6,10 @@ import { COMPANY } from '../data/company';
 interface Props {
   title?: string;
   description?: string;
+  image?: string; // картинка для соцсетей (og:image), абсолютный или от корня сайта
+  type?: 'website' | 'article' | 'product'; // og:type
 }
-const { title: customTitle, description: customDescription } = Astro.props;
+const { title: customTitle, description: customDescription, image: customImage, type: ogType = 'website' } = Astro.props;
 
 const currentLocale = Astro.currentLocale ?? 'pl';
 const locales = ['pl', 'ru', 'en'];
@@ -39,6 +41,14 @@ const meta = {
 const m = meta[currentLocale] ?? meta.pl;
 const pageTitle = customTitle ?? m.title;
 const pageDescription = customDescription ?? m.description;
+
+// SEO: канонический адрес, языковые версии (hreflang), Open Graph
+const SITE = 'https://charmelflowers.pl';
+const ogLocales = { pl: 'pl_PL', ru: 'ru_RU', en: 'en_GB' };
+const canonicalUrl = new URL(Astro.url.pathname, SITE).href;
+const alternates = locales.map((l) => ({ lang: l, href: new URL(getRelativeLocaleUrl(l, pathWithoutLocale), SITE).href }));
+const xDefault = alternates.find((a) => a.lang === 'pl')?.href ?? canonicalUrl;
+const ogImage = new URL(customImage ?? '/images/products/bouquet-05.jpg', SITE).href;
 
 const footer = {
   pl: {
@@ -136,6 +146,19 @@ const businessSchema = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{pageTitle}</title>
   <meta name="description" content={pageDescription} />
+  <link rel="canonical" href={canonicalUrl} />
+  {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+  <link rel="alternate" hreflang="x-default" href={xDefault} />
+  <meta property="og:type" content={ogType} />
+  <meta property="og:site_name" content="Charmel Flowers" />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:locale" content={ogLocales[currentLocale] ?? 'pl_PL'} />
+  {locales.filter((l) => l !== currentLocale).map((l) => <meta property="og:locale:alternate" content={ogLocales[l]} />)}
+  <meta name="twitter:card" content="summary_large_image" />
+  <slot name="head" />
   <link rel="icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />

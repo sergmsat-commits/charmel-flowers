@@ -1,10 +1,25 @@
 ---
+import { Image } from 'astro:assets';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { FLOWER_SPECIES } from '../data/flowerSpecies';
 import { ADDONS } from '../data/addons';
+import {
+  PRODUCT_TEXT,
+  paragraphs,
+  photoAlt,
+  photoUrl,
+  absoluteUrl,
+  speciesName,
+  variantCartId,
+  whatsappUrl,
+  type Locale,
+  type Product,
+} from '../data/products';
 
+interface Props {
+  product: Product;
+}
 const { product } = Astro.props;
-const currentLocale = Astro.currentLocale ?? 'pl';
+const currentLocale = (Astro.currentLocale ?? 'pl') as Locale;
 
 const labels = {
   pl: {
@@ -39,63 +54,73 @@ const labels = {
   },
 };
 const t = labels[currentLocale] ?? labels.pl;
-
-const speciesLookup = Object.fromEntries(FLOWER_SPECIES.map((s) => [s.slug, s]));
-function speciesLabel(slug) {
-  const entry = speciesLookup[slug];
-  if (!entry) return slug;
-  return entry[currentLocale] ?? entry.ru;
-}
+const pt = PRODUCT_TEXT[currentLocale];
 
 const addons = ADDONS;
 
 const visibleAddons = addons.slice(0, 4);
 const hiddenAddons = addons.slice(4);
 
-const galleryPhotos = (product.data.gallery ?? []).slice(0, 3);
-const allImages = [product.data.cover, ...(product.data.gallery ?? [])]
-  .map((f) => `/images/products/${f}`)
-  .join(',');
+const title = product.title[currentLocale];
+const photos = product.photos;
+const thumbs = photos.slice(1, 4);
+// Лайтбокс: все фото в WebP до 1600 px
+const lightboxUrls = await Promise.all(photos.map((p) => photoUrl(p, 1600)));
+const allImages = lightboxUrls.join(',');
+// Обложка для корзины
+const cartCover = await photoUrl(photos[0], 400);
 
 const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
 
-// Варианты товара (размер + цена). У большинства товаров пока один вариант —
-// тогда просто показываем его цену без переключателя размеров.
-const variants = product.data.variants;
+// Варианты товара (размер + цена). Пусто → «цена по запросу».
+const variants = product.variants;
 const hasMultipleVariants = variants.length > 1;
 const defaultVariant = variants[0];
-const variantPrices = variants.map((v) => v.price);
-const lowestPrice = Math.min(...variantPrices);
-const highestPrice = Math.max(...variantPrices);
 
-const descriptionParagraphs = product.data.description[currentLocale] ?? [];
-const descriptionPlainText = descriptionParagraphs.map((p) => p.text).join(' ');
+const descriptionParagraphs = paragraphs(product.description[currentLocale]);
+const descriptionPlainText = descriptionParagraphs.map((p) => (p.label ? `${p.label}: ${p.text}` : p.text)).join(' ');
 
-const productUrl = `https://charmelflowers.pl${Astro.url.pathname}`;
-const productSchema = {
+const productUrl = absoluteUrl(Astro.url.pathname);
+const askUrl = whatsappUrl(product, currentLocale, productUrl);
+
+const schemaAvailability = {
+  'in-stock': 'https://schema.org/InStock',
+  'made-to-order': 'https://schema.org/MadeToOrder',
+  'out-of-stock': 'https://schema.org/OutOfStock',
+}[product.availability];
+
+const productSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: product.data.title[currentLocale],
+  name: title,
   description: descriptionPlainText,
-  image: `https://charmelflowers.pl/images/products/${product.data.cover}`,
-  offers: hasMultipleVariants
+  image: (await Promise.all(photos.map((p) => photoUrl(p, 1200)))).map(absoluteUrl),
+  sku: product.id,
+  brand: { '@type': 'Brand', name: 'Charmel Flowers' },
+  url: productUrl,
+};
+if (!product.priceOnRequest) {
+  productSchema.offers = hasMultipleVariants
     ? {
         '@type': 'AggregateOffer',
-        lowPrice: lowestPrice,
-        highPrice: highestPrice,
+        lowPrice: product.minPrice,
+        highPrice: product.maxPrice,
         priceCurrency: 'PLN',
         offerCount: variants.length,
-        availability: 'https://schema.org/InStock',
+        availability: schemaAvailability,
+        itemCondition: 'https://schema.org/NewCondition',
         url: productUrl,
       }
     : {
         '@type': 'Offer',
         price: defaultVariant.price,
         priceCurrency: 'PLN',
-        availability: 'https://schema.org/InStock',
+        availability: schemaAvailability,
+        itemCondition: 'https://schema.org/NewCondition',
         url: productUrl,
-      },
-};
+        seller: { '@type': 'Organization', name: 'Charmel Flowers' },
+      };
+}
 ---
 
 <section class="product-detail">
@@ -104,18 +129,25 @@ const productSchema = {
 
   <div class="product-detail-layout">
     <div class="product-detail-image">
-      <img
-        src={`/images/products/${product.data.cover}`}
-        alt={product.data.title[currentLocale]}
+      <Image
+        src={photos[0]}
+        format="webp"
+        widths={[600, 1000, 1400].filter((w) => w <= photos[0].width).concat(photos[0].width < 600 ? [photos[0].width] : [])}
+        sizes="(max-width: 480px) 100vw, 480px"
+        alt={photoAlt(product, currentLocale, 0)}
         class="lightbox-trigger product-detail-main-img"
         data-images={allImages}
+        loading="eager"
+        fetchpriority="high"
       />
-      {galleryPhotos.length > 0 && (
+      {thumbs.length > 0 && (
         <div class="product-detail-thumbs">
-          {galleryPhotos.map((img) => (
-            <img
-              src={`/images/products/${img}`}
-              alt={product.data.title[currentLocale]}
+          {thumbs.map((img, i) => (
+            <Image
+              src={img}
+              format="webp"
+              width={Math.min(144, img.width)}
+              alt={photoAlt(product, currentLocale, i + 1)}
               class="lightbox-trigger product-detail-thumb"
               data-images={allImages}
             />
@@ -125,16 +157,36 @@ const productSchema = {
     </div>
 
     <div class="product-detail-info">
-      <h1>{product.data.title[currentLocale]}</h1>
+      <h1>{title}</h1>
+
+      {product.availability !== 'in-stock' && (
+        <p class={`product-availability product-availability--${product.availability}`}>
+          {product.availability === 'out-of-stock' ? pt.outOfStock : pt.madeToOrderNote}
+        </p>
+      )}
+
       <div class="product-detail-description">
         {descriptionParagraphs.map((p) => (
           <p>
             {p.label && <strong>{p.label}: </strong>}
-            {p.text}
+            {p.text.split('\n').map((line, i) => (
+              <>{i > 0 && <br />}{line}</>
+            ))}
           </p>
         ))}
+        {product.showNote && (
+          <p class="product-note"><strong>{pt.noteLabel}: </strong>{pt.note}</p>
+        )}
       </div>
-      <p class="product-detail-price" id="product-detail-price">{defaultVariant.price} {t.currency}</p>
+
+      {product.priceOnRequest ? (
+        <p class="product-detail-price" id="product-detail-price">{pt.priceOnRequest}</p>
+      ) : (
+        <p class="product-detail-price" id="product-detail-price">
+          <s class="product-old-price" id="product-detail-old-price" hidden={!defaultVariant.oldPrice}>{defaultVariant.oldPrice ? `${defaultVariant.oldPrice} ${t.currency}` : ''}</s>
+          <span id="product-detail-price-value">{defaultVariant.price} {t.currency}</span>
+        </p>
+      )}
 
       {hasMultipleVariants && (
         <div class="variant-selector">
@@ -146,6 +198,7 @@ const productSchema = {
                 class={`variant-option${i === 0 ? ' active' : ''}`}
                 data-variant-size={v.size}
                 data-variant-price={v.price}
+                data-variant-old-price={v.oldPrice ?? ''}
               >
                 {v.size}
               </button>
@@ -154,81 +207,87 @@ const productSchema = {
         </div>
       )}
 
-      {!hasMultipleVariants && defaultVariant.size && (
+      {!hasMultipleVariants && defaultVariant?.size && (
         <p class="product-detail-meta">
           <span class="product-detail-meta-label">{t.sizeLabel}:</span> <strong>{defaultVariant.size}</strong>
         </p>
       )}
 
-      {product.data.composition && product.data.composition.length > 0 && (
+      {product.composition.length > 0 && (
         <p class="product-detail-meta">
           <span class="product-detail-meta-label">{t.compositionLabel}:</span>{' '}
-          {product.data.composition.map((slug) => speciesLabel(slug)).join(', ')}
+          {product.composition.map((slug) => speciesName(slug, currentLocale)).join(', ')}
         </p>
       )}
 
-      <div class="addon-section">
-        <h2>{t.addons}</h2>
-        <div class="addon-grid">
-          {visibleAddons.map((addon) => (
-            <label class="addon-item">
-              <input
-                type="checkbox"
-                class="addon-checkbox"
-                data-addon-id={addon.id}
-                data-addon-title={addon.title[currentLocale]}
-                data-addon-price={addon.price}
-                data-addon-cover={addon.cover}
-              />
-              <img src={`/images/addons/${addon.cover}`} alt={addon.title[currentLocale]} />
-              <span class="addon-item-title">{addon.title[currentLocale]}</span>
-              <span class="addon-item-price">+{addon.price} {t.currency}</span>
-            </label>
-          ))}
-        </div>
+      {product.purchasable ? (
+        <>
+          <div class="addon-section">
+            <h2>{t.addons}</h2>
+            <div class="addon-grid">
+              {visibleAddons.map((addon) => (
+                <label class="addon-item">
+                  <input
+                    type="checkbox"
+                    class="addon-checkbox"
+                    data-addon-id={addon.id}
+                    data-addon-title={addon.title[currentLocale]}
+                    data-addon-price={addon.price}
+                    data-addon-cover={addon.cover}
+                  />
+                  <img src={`/images/addons/${addon.cover}`} alt={addon.title[currentLocale]} />
+                  <span class="addon-item-title">{addon.title[currentLocale]}</span>
+                  <span class="addon-item-price">+{addon.price} {t.currency}</span>
+                </label>
+              ))}
+            </div>
 
-        <div class="addon-grid" id="addon-grid-hidden" style="display:none;">
-          {hiddenAddons.map((addon) => (
-            <label class="addon-item">
-              <input
-                type="checkbox"
-                class="addon-checkbox"
-                data-addon-id={addon.id}
-                data-addon-title={addon.title[currentLocale]}
-                data-addon-price={addon.price}
-                data-addon-cover={addon.cover}
-              />
-              <img src={`/images/addons/${addon.cover}`} alt={addon.title[currentLocale]} />
-              <span class="addon-item-title">{addon.title[currentLocale]}</span>
-              <span class="addon-item-price">+{addon.price} {t.currency}</span>
-            </label>
-          ))}
-        </div>
+            <div class="addon-grid" id="addon-grid-hidden" style="display:none;">
+              {hiddenAddons.map((addon) => (
+                <label class="addon-item">
+                  <input
+                    type="checkbox"
+                    class="addon-checkbox"
+                    data-addon-id={addon.id}
+                    data-addon-title={addon.title[currentLocale]}
+                    data-addon-price={addon.price}
+                    data-addon-cover={addon.cover}
+                  />
+                  <img src={`/images/addons/${addon.cover}`} alt={addon.title[currentLocale]} />
+                  <span class="addon-item-title">{addon.title[currentLocale]}</span>
+                  <span class="addon-item-price">+{addon.price} {t.currency}</span>
+                </label>
+              ))}
+            </div>
 
-        <button
-          type="button"
-          class="addon-toggle-btn"
-          id="addon-toggle-btn"
-          data-show-more={t.showMore}
-          data-show-less={t.showLess}
-        >
-          {t.showMore}
-        </button>
-      </div>
+            <button
+              type="button"
+              class="addon-toggle-btn"
+              id="addon-toggle-btn"
+              data-show-more={t.showMore}
+              data-show-less={t.showLess}
+            >
+              {t.showMore}
+            </button>
+          </div>
 
-      <button
-        type="button"
-        class="add-to-cart-btn product-detail-add-btn"
-        id="product-detail-add-btn"
-        data-product-id={product.id}
-        data-base-title={product.data.title[currentLocale]}
-        data-id={hasMultipleVariants ? `${product.id}--${defaultVariant.size}` : product.id}
-        data-title={hasMultipleVariants ? `${product.data.title[currentLocale]} (${defaultVariant.size})` : product.data.title[currentLocale]}
-        data-price={defaultVariant.price}
-        data-cover={product.data.cover}
-      >
-        {t.addToCart}
-      </button>
+          <button
+            type="button"
+            class="add-to-cart-btn product-detail-add-btn"
+            id="product-detail-add-btn"
+            data-product-id={product.id}
+            data-base-title={title}
+            data-id={variantCartId(product, defaultVariant)}
+            data-title={hasMultipleVariants ? `${title} (${defaultVariant.size})` : title}
+            data-price={defaultVariant.price}
+            data-cover={cartCover}
+          >
+            {t.addToCart}
+          </button>
+        </>
+      ) : (
+        <a href={askUrl} target="_blank" rel="noopener" class="add-to-cart-btn product-detail-add-btn ask-whatsapp-btn">{pt.askWhatsApp}</a>
+      )}
     </div>
   </div>
 </section>
@@ -308,6 +367,44 @@ const productSchema = {
     border-color: var(--color-accent);
     color: var(--color-white);
   }
+  .product-old-price {
+    color: #999;
+    font-weight: normal;
+    font-size: 0.8em;
+    margin-right: 8px;
+  }
+
+  .product-availability {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0 0 16px;
+  }
+
+  .product-availability--out-of-stock {
+    background: #f3e3e3;
+    color: #8a2c2c;
+    font-weight: bold;
+  }
+
+  .product-availability--made-to-order {
+    background: var(--color-primary);
+    color: var(--color-accent);
+  }
+
+  /* Astro Image ставит width/height — высоту считаем по пропорциям фото */
+  .product-detail-image :global(img.product-detail-main-img) {
+    height: auto;
+  }
+
+  a.ask-whatsapp-btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    background-color: #25d366;
+  }
 </style>
 
 <script>
@@ -323,7 +420,6 @@ const productSchema = {
     });
   }
 
-  const priceEl = document.getElementById('product-detail-price');
   const addBtn = document.getElementById('product-detail-add-btn');
   const variantButtons = document.querySelectorAll('.variant-option');
 
@@ -334,9 +430,16 @@ const productSchema = {
 
       const size = btn.getAttribute('data-variant-size');
       const price = btn.getAttribute('data-variant-price');
+      const oldPrice = btn.getAttribute('data-variant-old-price');
 
-      if (priceEl) {
-        priceEl.textContent = `${price} zł`;
+      const priceValueEl = document.getElementById('product-detail-price-value');
+      const oldPriceEl = document.getElementById('product-detail-old-price');
+      if (priceValueEl) {
+        priceValueEl.textContent = `${price} zł`;
+      }
+      if (oldPriceEl) {
+        oldPriceEl.textContent = oldPrice ? `${oldPrice} zł` : '';
+        oldPriceEl.hidden = !oldPrice;
       }
       if (addBtn) {
         const productId = addBtn.getAttribute('data-product-id');

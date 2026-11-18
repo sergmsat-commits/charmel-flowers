@@ -1,11 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { minPrice } from '../data/pricing';
+import { getProducts, photoAlt, PRODUCT_TEXT, type Locale } from '../data/products';
 
-const currentLocale = Astro.currentLocale ?? 'pl';
-const allProducts = await getCollection('products');
-const featured = allProducts.filter((p) => p.data.featured);
+const currentLocale = (Astro.currentLocale ?? 'pl') as Locale;
+const pt = PRODUCT_TEXT[currentLocale];
+// «Показывать на главной»; «нет в наличии» на главной не показываем
+const featured = (await getProducts()).filter((p) => p.featured && p.availability !== 'out-of-stock');
 
 const labels = {
   pl: { title: 'Polecane', currency: 'zł', from: (p) => `od ${p} zł` },
@@ -15,11 +16,15 @@ const labels = {
 const t = labels[currentLocale] ?? labels.pl;
 
 const featuredWithPrice = featured.map((product) => {
-  const prices = product.data.variants.map((v) => v.price);
-  const lowestPrice = minPrice(prices);
-  const hasMultipleVariants = product.data.variants.length > 1;
+  const lowestPrice = product.minPrice;
+  const hasMultipleVariants = product.variants.length > 1;
   const productUrl = getRelativeLocaleUrl(currentLocale, `/product/${product.id}`);
-  return { product, lowestPrice, hasMultipleVariants, productUrl };
+  const priceText = product.priceOnRequest
+    ? pt.priceOnRequest
+    : hasMultipleVariants
+      ? t.from(lowestPrice)
+      : `${lowestPrice} ${t.currency}`;
+  return { product, priceText, productUrl };
 });
 ---
 
@@ -28,18 +33,18 @@ const featuredWithPrice = featured.map((product) => {
     <h2 class="featured-strip-title">{t.title}</h2>
     <div class="featured-track-wrapper">
       <div class="featured-track">
-        {featuredWithPrice.map(({ product, lowestPrice, hasMultipleVariants, productUrl }) => (
+        {featuredWithPrice.map(({ product, priceText, productUrl }) => (
           <a href={productUrl} class="featured-mini-card">
-            <img src={`/images/products/${product.data.cover}`} alt={product.data.title[currentLocale]} />
-            <p class="featured-mini-title">{product.data.title[currentLocale]}</p>
-            <p class="featured-mini-price">{hasMultipleVariants ? t.from(lowestPrice) : `${lowestPrice} ${t.currency}`}</p>
+            <Image src={product.photos[0]} format="webp" width={Math.min(360, product.photos[0].width)} alt={photoAlt(product, currentLocale, 0)} />
+            <p class="featured-mini-title">{product.title[currentLocale]}</p>
+            <p class="featured-mini-price">{priceText}</p>
           </a>
         ))}
-        {featuredWithPrice.map(({ product, lowestPrice, hasMultipleVariants, productUrl }) => (
-          <a href={productUrl} class="featured-mini-card" aria-hidden="true">
-            <img src={`/images/products/${product.data.cover}`} alt={product.data.title[currentLocale]} />
-            <p class="featured-mini-title">{product.data.title[currentLocale]}</p>
-            <p class="featured-mini-price">{hasMultipleVariants ? t.from(lowestPrice) : `${lowestPrice} ${t.currency}`}</p>
+        {featuredWithPrice.map(({ product, priceText, productUrl }) => (
+          <a href={productUrl} class="featured-mini-card" aria-hidden="true" tabindex="-1">
+            <Image src={product.photos[0]} format="webp" width={Math.min(360, product.photos[0].width)} alt="" />
+            <p class="featured-mini-title">{product.title[currentLocale]}</p>
+            <p class="featured-mini-price">{priceText}</p>
           </a>
         ))}
       </div>

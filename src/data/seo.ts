@@ -1,23 +1,16 @@
-// Meta description для страницы товара (то, что Google показывает в поиске).
-// 1) если у товара есть поле seo для нужного языка — берём его;
+// Meta description для страницы букета (то, что Google показывает в поиске).
+// 1) если у букета заполнено «SEO-описание» для нужного языка — берём его;
 // 2) иначе — первый абзац описания, обрезанный до ~160 символов по границе слова.
-type Locale = 'pl' | 'ru' | 'en';
-
-interface ProductLike {
-  data: {
-    description: Record<Locale, { label?: string; text: string }[]>;
-    seo?: Partial<Record<Locale, string>>;
-  };
-}
+import { paragraphs, type Locale, type Product } from './products';
 
 const MAX = 160;
 
-export function productMetaDescription(product: ProductLike, locale: string): string {
+export function productMetaDescription(product: Product, locale: string): string {
   const loc = (['pl', 'ru', 'en'].includes(locale) ? locale : 'pl') as Locale;
-  const seo = product.data.seo?.[loc]?.trim();
+  const seo = product.seo[loc]?.trim();
   if (seo) return seo;
 
-  const first = product.data.description[loc]?.[0]?.text?.trim() ?? '';
+  const first = paragraphs(product.description[loc])[0]?.text ?? product.title[loc];
   if (first.length <= MAX) return first;
   const cut = first.slice(0, MAX - 1);
   const lastSpace = cut.lastIndexOf(' ');

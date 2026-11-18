@@ -58,10 +58,10 @@ const catalogUrl = getRelativeLocaleUrl(currentLocale, '/catalog');
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = `
-        <img src="/images/products/${item.cover}" alt="${item.title}" class="product-img" />
+        <img src="${item.cover && item.cover.includes('/') ? item.cover : '/images/products/' + item.cover}" alt="${item.title}" class="product-img" />
         <h3 class="product-title">${item.title}</h3>
-        <p class="product-price">${item.price} ${currency}</p>
-        <button type="button" class="add-to-cart-btn" data-id="${item.id}" data-title="${item.title}" data-price="${item.price}" data-cover="${item.cover}">${addToCartLabel}</button>
+        <p class="product-price">${item.price ? item.price + ' ' + currency : ''}</p>
+        ${item.price ? `<button type="button" class="add-to-cart-btn" data-id="${item.id}" data-title="${item.title}" data-price="${item.price}" data-cover="${item.cover}">${addToCartLabel}</button>` : ''}
         <button type="button" class="favorites-remove-btn" data-id="${item.id}">${removeLabel}</button>
       `;
       container.appendChild(card);

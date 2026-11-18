@@ -1,12 +1,26 @@
 ---
-import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { FLOWER_SPECIES } from '../data/flowerSpecies';
-import { productPriceBuckets, minPrice } from '../data/pricing';
+import { productPriceBuckets } from '../data/pricing';
 import { SECTIONS } from '../data/sections';
+import {
+  getProducts,
+  paragraphs,
+  photoAlt,
+  photoUrl,
+  absoluteUrl,
+  variantCartId,
+  whatsappUrl,
+  PRODUCT_TEXT,
+  type Locale,
+} from '../data/products';
 
-const currentLocale = Astro.currentLocale ?? 'pl';
-const products = await getCollection('products');
+const currentLocale = (Astro.currentLocale ?? 'pl') as Locale;
+const pt = PRODUCT_TEXT[currentLocale];
+const products = await getProducts();
+// обложка для избранного и корзины (WebP 400 px)
+const cards = await Promise.all(products.map(async (product) => ({ product, cover400: await photoUrl(product.photos[0], 400) })));
 
 const ranges = ['100-200', '200-400', '400-600', '600-800', '1000+'];
 const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -108,47 +122,64 @@ const t = labels[currentLocale] ?? labels.pl;
     </aside>
 
     <div class="catalog-grid">
-      {products.map((product, index) => {
-        const prices = product.data.variants.map((v) => v.price);
+      {cards.map(({ product, cover400 }, index) => {
+        const prices = product.variants.map((v) => v.price);
         const priceBuckets = productPriceBuckets(prices).join(' ');
-        const productSizes = product.data.variants.map((v) => v.size).filter(Boolean).join(' ');
-        const lowestPrice = minPrice(prices);
-        const hasMultipleVariants = product.data.variants.length > 1;
+        const productSizes = product.variants.map((v) => v.size).filter(Boolean).join(' ');
+        const lowestPrice = product.minPrice;
+        const hasMultipleVariants = product.variants.length > 1;
+        const single = product.variants[0];
         const productUrl = getRelativeLocaleUrl(currentLocale, `/product/${product.id}`);
-        const descriptionParagraphs = product.data.description[currentLocale] ?? [];
-        const descriptionIntro = descriptionParagraphs[0]?.text ?? '';
+        const title = product.title[currentLocale];
+        const descriptionParagraphs = paragraphs(product.description[currentLocale]);
+        const descriptionIntro = descriptionParagraphs[0] ? (descriptionParagraphs[0].label ? `${descriptionParagraphs[0].label}: ${descriptionParagraphs[0].text}` : descriptionParagraphs[0].text) : '';
+        const badge =
+          product.availability === 'out-of-stock'
+            ? { text: pt.outOfStock, cls: 'product-badge product-badge--out' }
+            : product.hasOldPrice
+              ? { text: pt.promo, cls: 'product-badge product-badge--promo' }
+              : product.availability === 'made-to-order'
+                ? { text: pt.madeToOrder, cls: 'product-badge product-badge--order' }
+                : product.featured
+                  ? { text: t.featured, cls: 'product-badge' }
+                  : null;
 
         return (
           <div
-            class="product-card reveal"
+            class={`product-card reveal${product.availability === 'out-of-stock' ? ' product-card--out' : ''}`}
             style={`transition-delay: ${Math.min(index * 60, 300)}ms`}
             data-price-ranges={priceBuckets}
-            data-wedding={product.data.wedding ? 'true' : 'false'}
-            data-promo={product.data.promo ? 'true' : 'false'}
-            data-handmade={product.data.handmade ? 'true' : 'false'}
-            data-sections={(product.data.sections ?? []).join(' ')}
+            data-wedding={product.wedding ? 'true' : 'false'}
+            data-promo={product.promo ? 'true' : 'false'}
+            data-handmade={product.handmade ? 'true' : 'false'}
+            data-sections={product.sections.join(' ')}
             data-size={productSizes}
-            data-composition={(product.data.composition ?? []).join(',')}
+            data-composition={product.composition.join(',')}
           >
-            {product.data.featured && <span class="product-badge">{t.featured}</span>}
+            {badge && <span class={badge.cls}>{badge.text}</span>}
             <button
               class="favorite-btn"
               data-favorite-id={product.id}
-              data-favorite-title={product.data.title[currentLocale]}
-              data-favorite-price={lowestPrice}
-              data-favorite-cover={product.data.cover}
+              data-favorite-title={title}
+              data-favorite-price={lowestPrice ?? ''}
+              data-favorite-cover={cover400}
               aria-label="Favorite"
             >♥</button>
             <a href={productUrl} class="product-image-link">
-              <img
-                src={`/images/products/${product.data.cover}`}
-                alt={product.data.title[currentLocale]}
+              <Image
+                src={product.photos[0]}
+                format="webp"
+                widths={[400, 800].filter((w) => w <= product.photos[0].width).concat(product.photos[0].width < 400 ? [product.photos[0].width] : [])}
+                sizes="(max-width: 480px) 100vw, 320px"
+                alt={photoAlt(product, currentLocale, 0)}
                 class="product-img"
+                loading={index < 3 ? 'eager' : 'lazy'}
               />
             </a>
             <a href={productUrl} class="product-title-link">
-              <h3 class="product-title">{product.data.title[currentLocale]}</h3>
+              <h3 class="product-title">{title}</h3>
             </a>
+            {descriptionParagraphs.length > 0 && (
             <div class="product-description-wrap">
               <p class="product-description product-description-preview">{descriptionIntro}</p>
               <div class="product-description-full">
@@ -168,16 +199,30 @@ const t = labels[currentLocale] ?? labels.pl;
                 {t.descMore}
               </button>
             </div>
-            <p class="product-price">{hasMultipleVariants ? t.from(lowestPrice) : `${lowestPrice} ${t.currency}`}</p>
-            {hasMultipleVariants ? (
+            )}
+            <p class="product-price">
+              {product.priceOnRequest
+                ? pt.priceOnRequest
+                : hasMultipleVariants
+                  ? t.from(lowestPrice)
+                  : (
+                    <>
+                      {single.oldPrice && <s class="product-old-price">{single.oldPrice} {t.currency}</s>}
+                      {`${lowestPrice} ${t.currency}`}
+                    </>
+                  )}
+            </p>
+            {!product.purchasable ? (
+              <a href={whatsappUrl(product, currentLocale, absoluteUrl(productUrl))} target="_blank" rel="noopener" class="add-to-cart-btn ask-whatsapp-btn">{pt.askWhatsApp}</a>
+            ) : hasMultipleVariants ? (
               <a href={productUrl} class="add-to-cart-btn">{t.chooseSize}</a>
             ) : (
               <button
                 class="add-to-cart-btn"
-                data-id={product.id}
-                data-title={product.data.title[currentLocale]}
-                data-price={lowestPrice}
-                data-cover={product.data.cover}
+                data-id={variantCartId(product, single)}
+                data-title={title}
+                data-price={single.price}
+                data-cover={cover400}
               >
                 {t.addToCart}
               </button>
@@ -308,6 +353,33 @@ const t = labels[currentLocale] ?? labels.pl;
 
   .product-description-full p strong {
     color: var(--color-accent);
+  }
+
+  .product-old-price {
+    color: #999;
+    font-weight: normal;
+    font-size: 0.85em;
+    margin-right: 6px;
+  }
+
+  .product-badge--promo {
+    background-color: #b5523b;
+  }
+
+  .product-badge--order {
+    background-color: var(--color-accent);
+  }
+
+  .product-badge--out {
+    background-color: #777;
+  }
+
+  .product-card--out .product-img {
+    opacity: 0.6;
+  }
+
+  a.ask-whatsapp-btn {
+    background-color: #25d366;
   }
 
   .description-toggle-btn {
